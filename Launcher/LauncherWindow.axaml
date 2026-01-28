@@ -1,0 +1,27 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="betareborn.Launcher.LauncherWindow"
+        Title="BetaCraft Launcher"
+        Width="400" Height="300"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False">
+    <StackPanel Margin="20" Spacing="15">
+        <TextBlock Text="BetaCraft" 
+                   FontSize="24" 
+                   HorizontalAlignment="Center"/>
+        
+        <TextBlock x:Name="StatusText" 
+                   Text="Ready to launch" 
+                   HorizontalAlignment="Center"/>
+        
+        <Button x:Name="MicrosoftLoginButton" 
+                Content="Login with Microsoft" 
+                HorizontalAlignment="Stretch"
+                Click="OnMicrosoftLogin"/>
+        
+        <Button x:Name="ProvideJar" 
+                Content="Provide b1.7.3.jar" 
+                HorizontalAlignment="Stretch"
+                Click="OnProvideJar"/>
+    </StackPanel>
+</Window>

@@ -1,0 +1,25 @@
+using betareborn.Worlds;
+
+namespace betareborn.Entities
+{
+    public class EntityGiantZombie : EntityMob
+    {
+        public static readonly new java.lang.Class Class = ikvm.runtime.Util.getClassFromTypeHandle(typeof(EntityGiantZombie).TypeHandle);
+
+        public EntityGiantZombie(World var1) : base(var1)
+        {
+            texture = "/mob/zombie.png";
+            moveSpeed = 0.5F;
+            attackStrength = 50;
+            health *= 10;
+            yOffset *= 6.0F;
+            setSize(width * 6.0F, height * 6.0F);
+        }
+
+        protected override float getBlockPathWeight(int var1, int var2, int var3)
+        {
+            return worldObj.getLightBrightness(var1, var2, var3) - 0.5F;
+        }
+    }
+
+}

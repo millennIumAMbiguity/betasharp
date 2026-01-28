@@ -1,0 +1,242 @@
+using betareborn.Entities;
+using betareborn.Items;
+using betareborn.Materials;
+using betareborn.Stats;
+using betareborn.Worlds;
+
+namespace betareborn.Blocks
+{
+    public class BlockLeaves : BlockLeavesBase
+    {
+        private int baseIndexInPNG;
+        int[] adjacentTreeBlocks;
+
+        public BlockLeaves(int var1, int var2) : base(var1, var2, Material.leaves, false)
+        {
+            baseIndexInPNG = var2;
+            setTickOnLoad(true);
+        }
+
+        public override int getRenderColor(int var1)
+        {
+            return (var1 & 1) == 1 ? ColorizerFoliage.getFoliageColorPine() : ((var1 & 2) == 2 ? ColorizerFoliage.getFoliageColorBirch() : ColorizerFoliage.func_31073_c());
+        }
+
+        public override int colorMultiplier(IBlockAccess var1, int var2, int var3, int var4)
+        {
+            int var5 = var1.getBlockMetadata(var2, var3, var4);
+            if ((var5 & 1) == 1)
+            {
+                return ColorizerFoliage.getFoliageColorPine();
+            }
+            else if ((var5 & 2) == 2)
+            {
+                return ColorizerFoliage.getFoliageColorBirch();
+            }
+            else
+            {
+                var1.getWorldChunkManager().func_4069_a(var2, var4, 1, 1);
+                double var6 = var1.getWorldChunkManager().temperature[0];
+                double var8 = var1.getWorldChunkManager().humidity[0];
+                return ColorizerFoliage.getFoliageColor(var6, var8);
+            }
+        }
+
+        public override void onBlockRemoval(World var1, int var2, int var3, int var4)
+        {
+            sbyte var5 = 1;
+            int var6 = var5 + 1;
+            if (var1.checkChunksExist(var2 - var6, var3 - var6, var4 - var6, var2 + var6, var3 + var6, var4 + var6))
+            {
+                for (int var7 = -var5; var7 <= var5; ++var7)
+                {
+                    for (int var8 = -var5; var8 <= var5; ++var8)
+                    {
+                        for (int var9 = -var5; var9 <= var5; ++var9)
+                        {
+                            int var10 = var1.getBlockId(var2 + var7, var3 + var8, var4 + var9);
+                            if (var10 == Block.leaves.blockID)
+                            {
+                                int var11 = var1.getBlockMetadata(var2 + var7, var3 + var8, var4 + var9);
+                                var1.setBlockMetadata(var2 + var7, var3 + var8, var4 + var9, var11 | 8);
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+
+        public override void updateTick(World var1, int var2, int var3, int var4, java.util.Random var5)
+        {
+            if (!var1.multiplayerWorld)
+            {
+                int var6 = var1.getBlockMetadata(var2, var3, var4);
+                if ((var6 & 8) != 0)
+                {
+                    sbyte var7 = 4;
+                    int var8 = var7 + 1;
+                    sbyte var9 = 32;
+                    int var10 = var9 * var9;
+                    int var11 = var9 / 2;
+                    if (adjacentTreeBlocks == null)
+                    {
+                        adjacentTreeBlocks = new int[var9 * var9 * var9];
+                    }
+
+                    int var12;
+                    if (var1.checkChunksExist(var2 - var8, var3 - var8, var4 - var8, var2 + var8, var3 + var8, var4 + var8))
+                    {
+                        var12 = -var7;
+
+                        while (var12 <= var7)
+                        {
+                            int var13;
+                            int var14;
+                            int var15;
+
+                            for (var13 = -var7; var13 <= var7; ++var13)
+                            {
+                                for (var14 = -var7; var14 <= var7; ++var14)
+                                {
+                                    var15 = var1.getBlockId(var2 + var12, var3 + var13, var4 + var14);
+                                    if (var15 == Block.wood.blockID)
+                                    {
+                                        adjacentTreeBlocks[(var12 + var11) * var10 + (var13 + var11) * var9 + var14 + var11] = 0;
+                                    }
+                                    else if (var15 == Block.leaves.blockID)
+                                    {
+                                        adjacentTreeBlocks[(var12 + var11) * var10 + (var13 + var11) * var9 + var14 + var11] = -2;
+                                    }
+                                    else
+                                    {
+                                        adjacentTreeBlocks[(var12 + var11) * var10 + (var13 + var11) * var9 + var14 + var11] = -1;
+                                    }
+                                }
+                            }
+
+                            ++var12;
+                        }
+
+                        for (var12 = 1; var12 <= 4; ++var12)
+                        {
+                            int var13;
+                            int var14;
+                            int var15;
+
+                            for (var13 = -var7; var13 <= var7; ++var13)
+                            {
+                                for (var14 = -var7; var14 <= var7; ++var14)
+                                {
+                                    for (var15 = -var7; var15 <= var7; ++var15)
+                                    {
+                                        if (adjacentTreeBlocks[(var13 + var11) * var10 + (var14 + var11) * var9 + var15 + var11] == var12 - 1)
+                                        {
+                                            if (adjacentTreeBlocks[(var13 + var11 - 1) * var10 + (var14 + var11) * var9 + var15 + var11] == -2)
+                                            {
+                                                adjacentTreeBlocks[(var13 + var11 - 1) * var10 + (var14 + var11) * var9 + var15 + var11] = var12;
+                                            }
+
+                                            if (adjacentTreeBlocks[(var13 + var11 + 1) * var10 + (var14 + var11) * var9 + var15 + var11] == -2)
+                                            {
+                                                adjacentTreeBlocks[(var13 + var11 + 1) * var10 + (var14 + var11) * var9 + var15 + var11] = var12;
+                                            }
+
+                                            if (adjacentTreeBlocks[(var13 + var11) * var10 + (var14 + var11 - 1) * var9 + var15 + var11] == -2)
+                                            {
+                                                adjacentTreeBlocks[(var13 + var11) * var10 + (var14 + var11 - 1) * var9 + var15 + var11] = var12;
+                                            }
+
+                                            if (adjacentTreeBlocks[(var13 + var11) * var10 + (var14 + var11 + 1) * var9 + var15 + var11] == -2)
+                                            {
+                                                adjacentTreeBlocks[(var13 + var11) * var10 + (var14 + var11 + 1) * var9 + var15 + var11] = var12;
+                                            }
+
+                                            if (adjacentTreeBlocks[(var13 + var11) * var10 + (var14 + var11) * var9 + (var15 + var11 - 1)] == -2)
+                                            {
+                                                adjacentTreeBlocks[(var13 + var11) * var10 + (var14 + var11) * var9 + (var15 + var11 - 1)] = var12;
+                                            }
+
+                                            if (adjacentTreeBlocks[(var13 + var11) * var10 + (var14 + var11) * var9 + var15 + var11 + 1] == -2)
+                                            {
+                                                adjacentTreeBlocks[(var13 + var11) * var10 + (var14 + var11) * var9 + var15 + var11 + 1] = var12;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    var12 = adjacentTreeBlocks[var11 * var10 + var11 * var9 + var11];
+                    if (var12 >= 0)
+                    {
+                        var1.setBlockMetadata(var2, var3, var4, var6 & -9);
+                    }
+                    else
+                    {
+                        removeLeaves(var1, var2, var3, var4);
+                    }
+                }
+
+            }
+        }
+
+        private void removeLeaves(World var1, int var2, int var3, int var4)
+        {
+            dropBlockAsItem(var1, var2, var3, var4, var1.getBlockMetadata(var2, var3, var4));
+            var1.setBlockWithNotify(var2, var3, var4, 0);
+        }
+
+        public override int quantityDropped(java.util.Random var1)
+        {
+            return var1.nextInt(20) == 0 ? 1 : 0;
+        }
+
+        public override int idDropped(int var1, java.util.Random var2)
+        {
+            return Block.sapling.blockID;
+        }
+
+        public override void harvestBlock(World var1, EntityPlayer var2, int var3, int var4, int var5, int var6)
+        {
+            if (!var1.multiplayerWorld && var2.getCurrentEquippedItem() != null && var2.getCurrentEquippedItem().itemID == Item.shears.shiftedIndex)
+            {
+                var2.addStat(StatList.mineBlockStatArray[blockID], 1);
+                dropBlockAsItem_do(var1, var3, var4, var5, new ItemStack(Block.leaves.blockID, 1, var6 & 3));
+            }
+            else
+            {
+                base.harvestBlock(var1, var2, var3, var4, var5, var6);
+            }
+
+        }
+
+        protected override int damageDropped(int var1)
+        {
+            return var1 & 3;
+        }
+
+        public override bool isOpaqueCube()
+        {
+            return !graphicsLevel;
+        }
+
+        public override int getBlockTextureFromSideAndMetadata(int var1, int var2)
+        {
+            return (var2 & 3) == 1 ? blockIndexInTexture + 80 : blockIndexInTexture;
+        }
+
+        public void setGraphicsLevel(bool var1)
+        {
+            graphicsLevel = var1;
+            blockIndexInTexture = baseIndexInPNG + (var1 ? 0 : 1);
+        }
+
+        public override void onEntityWalking(World var1, int var2, int var3, int var4, Entity var5)
+        {
+            base.onEntityWalking(var1, var2, var3, var4, var5);
+        }
+    }
+
+}

@@ -1,0 +1,233 @@
+using betareborn.Worlds;
+using java.lang;
+
+namespace betareborn.Entities
+{
+    public class EntityCreature : EntityLiving
+    {
+        public static readonly new Class Class = ikvm.runtime.Util.getClassFromTypeHandle(typeof(EntityCreature).TypeHandle);
+        private PathEntity pathToEntity;
+        protected Entity playerToAttack;
+        protected bool hasAttacked = false;
+
+        public EntityCreature(World var1) : base(var1)
+        {
+        }
+
+        protected virtual bool isMovementCeased()
+        {
+            return false;
+        }
+
+        public override void updatePlayerActionState()
+        {
+            hasAttacked = isMovementCeased();
+            float var1 = 16.0F;
+            if (playerToAttack == null)
+            {
+                playerToAttack = findPlayerToAttack();
+                if (playerToAttack != null)
+                {
+                    pathToEntity = worldObj.getPathToEntity(this, playerToAttack, var1);
+                }
+            }
+            else if (!playerToAttack.isEntityAlive())
+            {
+                playerToAttack = null;
+            }
+            else
+            {
+                float var2 = playerToAttack.getDistanceToEntity(this);
+                if (canEntityBeSeen(playerToAttack))
+                {
+                    attackEntity(playerToAttack, var2);
+                }
+                else
+                {
+                    attackBlockedEntity(playerToAttack, var2);
+                }
+            }
+
+            if (hasAttacked || playerToAttack == null || pathToEntity != null && rand.nextInt(20) != 0)
+            {
+                if (!hasAttacked && (pathToEntity == null && rand.nextInt(80) == 0 || rand.nextInt(80) == 0))
+                {
+                    func_31026_E();
+                }
+            }
+            else
+            {
+                pathToEntity = worldObj.getPathToEntity(this, playerToAttack, var1);
+            }
+
+            int var21 = MathHelper.floor_double(boundingBox.minY + 0.5D);
+            bool var3 = isInWater();
+            bool var4 = handleLavaMovement();
+            rotationPitch = 0.0F;
+            if (pathToEntity != null && rand.nextInt(100) != 0)
+            {
+                Vec3D var5 = pathToEntity.getPosition(this);
+                double var6 = (double)(width * 2.0F);
+
+                while (var5 != null && var5.squareDistanceTo(posX, var5.yCoord, posZ) < var6 * var6)
+                {
+                    pathToEntity.incrementPathIndex();
+                    if (pathToEntity.isFinished())
+                    {
+                        var5 = null;
+                        pathToEntity = null;
+                    }
+                    else
+                    {
+                        var5 = pathToEntity.getPosition(this);
+                    }
+                }
+
+                isJumping = false;
+                if (var5 != null)
+                {
+                    double var8 = var5.xCoord - posX;
+                    double var10 = var5.zCoord - posZ;
+                    double var12 = var5.yCoord - (double)var21;
+                    float var14 = (float)(java.lang.Math.atan2(var10, var8) * 180.0D / (double)((float)java.lang.Math.PI)) - 90.0F;
+                    float var15 = var14 - rotationYaw;
+
+                    for (moveForward = moveSpeed; var15 < -180.0F; var15 += 360.0F)
+                    {
+                    }
+
+                    while (var15 >= 180.0F)
+                    {
+                        var15 -= 360.0F;
+                    }
+
+                    if (var15 > 30.0F)
+                    {
+                        var15 = 30.0F;
+                    }
+
+                    if (var15 < -30.0F)
+                    {
+                        var15 = -30.0F;
+                    }
+
+                    rotationYaw += var15;
+                    if (hasAttacked && playerToAttack != null)
+                    {
+                        double var16 = playerToAttack.posX - posX;
+                        double var18 = playerToAttack.posZ - posZ;
+                        float var20 = rotationYaw;
+                        rotationYaw = (float)(java.lang.Math.atan2(var18, var16) * 180.0D / (double)((float)java.lang.Math.PI)) - 90.0F;
+                        var15 = (var20 - rotationYaw + 90.0F) * (float)java.lang.Math.PI / 180.0F;
+                        moveStrafing = -MathHelper.sin(var15) * moveForward * 1.0F;
+                        moveForward = MathHelper.cos(var15) * moveForward * 1.0F;
+                    }
+
+                    if (var12 > 0.0D)
+                    {
+                        isJumping = true;
+                    }
+                }
+
+                if (playerToAttack != null)
+                {
+                    faceEntity(playerToAttack, 30.0F, 30.0F);
+                }
+
+                if (isCollidedHorizontally && !hasPath())
+                {
+                    isJumping = true;
+                }
+
+                if (rand.nextFloat() < 0.8F && (var3 || var4))
+                {
+                    isJumping = true;
+                }
+
+            }
+            else
+            {
+                base.updatePlayerActionState();
+                pathToEntity = null;
+            }
+        }
+
+        protected void func_31026_E()
+        {
+            bool var1 = false;
+            int var2 = -1;
+            int var3 = -1;
+            int var4 = -1;
+            float var5 = -99999.0F;
+
+            for (int var6 = 0; var6 < 10; ++var6)
+            {
+                int var7 = MathHelper.floor_double(posX + (double)rand.nextInt(13) - 6.0D);
+                int var8 = MathHelper.floor_double(posY + (double)rand.nextInt(7) - 3.0D);
+                int var9 = MathHelper.floor_double(posZ + (double)rand.nextInt(13) - 6.0D);
+                float var10 = getBlockPathWeight(var7, var8, var9);
+                if (var10 > var5)
+                {
+                    var5 = var10;
+                    var2 = var7;
+                    var3 = var8;
+                    var4 = var9;
+                    var1 = true;
+                }
+            }
+
+            if (var1)
+            {
+                pathToEntity = worldObj.getEntityPathToXYZ(this, var2, var3, var4, 10.0F);
+            }
+
+        }
+
+        protected virtual void attackEntity(Entity var1, float var2)
+        {
+        }
+
+        protected virtual void attackBlockedEntity(Entity var1, float var2)
+        {
+        }
+
+        protected virtual float getBlockPathWeight(int var1, int var2, int var3)
+        {
+            return 0.0F;
+        }
+
+        protected virtual Entity findPlayerToAttack()
+        {
+            return null;
+        }
+
+        public override bool getCanSpawnHere()
+        {
+            int var1 = MathHelper.floor_double(posX);
+            int var2 = MathHelper.floor_double(boundingBox.minY);
+            int var3 = MathHelper.floor_double(posZ);
+            return base.getCanSpawnHere() && getBlockPathWeight(var1, var2, var3) >= 0.0F;
+        }
+
+        public bool hasPath()
+        {
+            return pathToEntity != null;
+        }
+
+        public void setPathToEntity(PathEntity var1)
+        {
+            pathToEntity = var1;
+        }
+
+        public Entity getTarget()
+        {
+            return playerToAttack;
+        }
+
+        public void setTarget(Entity var1)
+        {
+            playerToAttack = var1;
+        }
+    }
+
+}

@@ -1,0 +1,84 @@
+namespace betareborn
+{
+    public class EnumOptions : java.lang.Object
+    {
+        public static readonly EnumOptions MUSIC = new("options.music", true, false, 0);
+        public static readonly EnumOptions SOUND = new("options.sound", true, false, 1);
+        public static readonly EnumOptions INVERT_MOUSE = new("options.invertMouse", false, true, 2);
+        public static readonly EnumOptions SENSITIVITY = new("options.sensitivity", true, false, 3);
+        public static readonly EnumOptions RENDER_DISTANCE = new("options.renderDistance", false, false, 4);
+        public static readonly EnumOptions VIEW_BOBBING = new("options.viewBobbing", false, true, 5);
+        public static readonly EnumOptions ADVANCED_OPENGL = new("options.advancedOpengl", false, true, 7);
+        public static readonly EnumOptions FRAMERATE_LIMIT = new("options.framerateLimit", false, false, 8);
+        public static readonly EnumOptions DIFFICULTY = new("options.difficulty", false, false, 9);
+        public static readonly EnumOptions GRAPHICS = new("options.graphics", false, false, 10);
+        public static readonly EnumOptions AMBIENT_OCCLUSION = new("options.ao", false, true, 11);
+        public static readonly EnumOptions GUI_SCALE = new("options.guiScale", false, false, 12);
+
+        private static readonly EnumOptions[] allValues =
+        [
+            MUSIC, SOUND, INVERT_MOUSE, SENSITIVITY, RENDER_DISTANCE, VIEW_BOBBING, ADVANCED_OPENGL, FRAMERATE_LIMIT, DIFFICULTY, GRAPHICS,
+            AMBIENT_OCCLUSION, GUI_SCALE
+        ];
+
+        private readonly bool enumFloat;
+        private readonly bool enumBoolean;
+        private readonly string enumString;
+        private readonly int ordinalValue;
+
+        public static EnumOptions getEnumOptions(int var0)
+        {
+            EnumOptions[] var1 = values();
+            int var2 = var1.Length;
+
+            for (int var3 = 0; var3 < var2; ++var3)
+            {
+                EnumOptions var4 = var1[var3];
+                if (var4.returnEnumOrdinal() == var0)
+                {
+                    return var4;
+                }
+            }
+
+            return null;
+        }
+
+        private EnumOptions(string var3, bool var4, bool var5, int ordinal)
+        {
+            enumString = var3;
+            enumFloat = var4;
+            enumBoolean = var5;
+            ordinalValue = ordinal;
+        }
+
+        public bool getEnumFloat()
+        {
+            return enumFloat;
+        }
+
+        public bool getEnumBoolean()
+        {
+            return enumBoolean;
+        }
+
+        public int returnEnumOrdinal()
+        {
+            return ordinal();
+        }
+
+        public string getEnumString()
+        {
+            return enumString;
+        }
+
+        public int ordinal()
+        {
+            return ordinalValue;
+        }
+
+        public static EnumOptions[] values()
+        {
+            return allValues;
+        }
+    }
+}

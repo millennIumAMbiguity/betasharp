@@ -1,0 +1,25 @@
+using betareborn.Blocks;
+
+namespace betareborn.Items
+{
+    public class ItemSapling : ItemBlock
+    {
+
+        public ItemSapling(int var1) : base(var1)
+        {
+            setMaxDamage(0);
+            setHasSubtypes(true);
+        }
+
+        public override int getPlacedBlockMetadata(int var1)
+        {
+            return var1;
+        }
+
+        public override int getIconFromDamage(int var1)
+        {
+            return Block.sapling.getBlockTextureFromSideAndMetadata(0, var1);
+        }
+    }
+
+}

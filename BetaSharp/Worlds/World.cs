@@ -68,7 +68,7 @@ public abstract class World : java.lang.Object, BlockView
     private int soundCounter;
     private readonly List<Entity> tempEntityList;
     public bool isRemote;
-    public RuleSet rules;
+    public RuleSet Rules { get; protected set; }
 
     public BiomeSource getBiomeSource()
     {
@@ -119,7 +119,7 @@ public abstract class World : java.lang.Object, BlockView
         persistentStateManager = new PersistentStateManager(var1);
         var3.setWorld(this);
         chunkSource = CreateChunkCache();
-        rules = properties.RulesTag != null
+        Rules = properties.RulesTag != null
             ? RuleSet.FromNBT(RuleRegistry.Instance, properties.RulesTag)
             : new RuleSet(RuleRegistry.Instance);
         updateSkyBrightness();
@@ -165,7 +165,7 @@ public abstract class World : java.lang.Object, BlockView
         dimension = var2;
         var2.setWorld(this);
         chunkSource = CreateChunkCache();
-        rules = properties.RulesTag != null
+        Rules = properties.RulesTag != null
             ? RuleSet.FromNBT(RuleRegistry.Instance, properties.RulesTag)
             : new RuleSet(RuleRegistry.Instance);
         updateSkyBrightness();
@@ -238,7 +238,7 @@ public abstract class World : java.lang.Object, BlockView
 
         dimension.setWorld(this);
         chunkSource = CreateChunkCache();
-        rules = properties.RulesTag != null
+        Rules = properties.RulesTag != null
             ? RuleSet.FromNBT(RuleRegistry.Instance, properties.RulesTag)
             : new RuleSet(RuleRegistry.Instance);
 
@@ -353,7 +353,7 @@ public abstract class World : java.lang.Object, BlockView
         Profiler.Start("saveWorldInfoAndPlayer");
 
         properties.RulesTag = new NBTTagCompound();
-        rules.WriteToNBT(properties.RulesTag);
+        Rules.WriteToNBT(properties.RulesTag);
 
         storage.save(properties, players.Cast<EntityPlayer>().ToList());
         Profiler.Stop("saveWorldInfoAndPlayer");

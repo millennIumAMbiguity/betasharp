@@ -9,6 +9,6 @@ public class ReadOnlyServerWorld : ServerWorld
     {
         persistentStateManager = del.persistentStateManager;
         properties = new DerivingWorldProperties(del.getProperties());
-        rules = del.rules;
+        Rules = del.Rules;
     }
 }

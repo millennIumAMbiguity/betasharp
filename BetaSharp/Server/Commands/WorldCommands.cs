@@ -204,7 +204,7 @@ public static class WorldCommands
     {
         ServerPlayerEntity player = server.playerManager.getPlayer(senderName);
         ServerWorld world = player != null ? server.getWorld(player.dimensionId) : server.worlds[0];
-        RuleSet rules = world.rules;
+        RuleSet rules = world.Rules;
         RuleRegistry registry = RuleRegistry.Instance;
 
         if (args.Length == 0)

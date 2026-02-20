@@ -2,7 +2,8 @@ namespace BetaSharp.Rules;
 
 internal sealed class DefaultRules : IRulesProvider
 {
-    public static DefaultRules Instance { get; } = new();
+    internal static DefaultRules Instance { get; } = new();
+    internal static BoolRule DoFireTick { get; private set; } = null!;
 
     private DefaultRules()
     {
@@ -12,6 +13,6 @@ internal sealed class DefaultRules : IRulesProvider
     {
         RuleRegistrar r = registry.For(ResourceLocation.DefaultNamespace);
 
-        r.Bool("do_fire_tick", true, description: "Whether fire should spread and naturally extinguish.");
+        DoFireTick = r.Bool("do_fire_tick", true, description: "Whether fire should spread and naturally extinguish.");
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using BetaSharp.NBT;
 
 namespace BetaSharp.Rules;
 
@@ -62,6 +63,26 @@ public sealed class RuleSet(RuleRegistry registry)
     {
         foreach ((string? rawKey, string? rawValue) in data)
             TrySet(ResourceLocation.Parse(rawKey), rawValue);
+    }
+
+    public void WriteToNBT(NBTTagCompound nbt)
+    {
+        foreach ((ResourceLocation? key, IRuleValue? value) in _values)
+        {
+            IGameRule rule = registry.Get(key);
+            nbt.SetString(key.ToString(), rule.Serialize(value));
+        }
+    }
+
+    public static RuleSet ReadFromNBT(RuleRegistry registry, NBTTagCompound nbt)
+    {
+        RuleSet ruleSet = new(registry);
+        foreach ((string key, NBTBase value) in nbt.Dictionary)
+        {
+            if (value is NBTTagString str)
+                ruleSet.TrySet(ResourceLocation.Parse(key), str.Value);
+        }
+        return ruleSet;
     }
 
     public IEnumerable<(IGameRule Rule, IRuleValue Value)> NonDefaultValues()

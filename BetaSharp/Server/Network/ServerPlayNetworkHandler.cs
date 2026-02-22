@@ -168,7 +168,7 @@ public class ServerPlayNetworkHandler : NetHandler, CommandOutput
                     return;
                 }
 
-                if (java.lang.Math.abs(packet.x) > 3.2E7 || java.lang.Math.abs(packet.z) > 3.2E7)
+                if (System.Math.Abs(packet.x) > 3.2E7 || System.Math.Abs(packet.z) > 3.2E7)
                 {
                     disconnect("Illegal position");
                     return;

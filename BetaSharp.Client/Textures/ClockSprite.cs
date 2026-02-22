@@ -71,8 +71,8 @@ public class ClockSprite : DynamicTexture
         angleDelta += var22 * 0.1D;
         angleDelta *= 0.8D;
         angle += angleDelta;
-        double var5 = java.lang.Math.sin(angle);
-        double var7 = java.lang.Math.cos(angle);
+        double var5 = Math.Sin(angle);
+        double var7 = Math.Cos(angle);
 
         for (int var9 = 0; var9 < 256; ++var9)
         {

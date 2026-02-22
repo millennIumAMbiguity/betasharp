@@ -63,7 +63,7 @@ public class CompassSprite : DynamicTexture
             Vec3i var21 = mc.world.getSpawnPos();
             double var23 = var21.X - mc.player.x;
             double var25 = var21.Z - mc.player.z;
-            var20 = (double)(mc.player.yaw - 90.0F) * Math.PI / 180.0D - java.lang.Math.atan2(var25, var23);
+            var20 = (double)(mc.player.yaw - 90.0F) * Math.PI / 180.0D - Math.Atan2(var25, var23);
             if (mc.world.dimension.IsNether)
             {
                 var20 = java.lang.Math.random() * (double)(float)Math.PI * 2.0D;
@@ -93,8 +93,8 @@ public class CompassSprite : DynamicTexture
         angleDelta += var22 * 0.1D;
         angleDelta *= 0.8D;
         angle += angleDelta;
-        double var24 = java.lang.Math.sin(angle);
-        double var26 = java.lang.Math.cos(angle);
+        double var24 = Math.Sin(angle);
+        double var26 = Math.Cos(angle);
 
         int var9;
         int var10;

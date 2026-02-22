@@ -909,7 +909,7 @@ public abstract class EntityPlayer : EntityLiving
             {
                 if (y > 0.0D)
                 {
-                    increaseStat(Stats.Stats.distanceClimbedStat, (int)Math.Round(y * 100.0D));
+                    increaseStat(Stats.Stats.distanceClimbedStat, (int)java.lang.Math.round(y * 100.0D));
                 }
             }
             else if (onGround)
@@ -973,7 +973,7 @@ public abstract class EntityPlayer : EntityLiving
     {
         if (fallDistance >= 2.0F)
         {
-            increaseStat(Stats.Stats.distanceFallenStat, (int)Math.Round((double)fallDistance * 100.0D));
+            increaseStat(Stats.Stats.distanceFallenStat, (int)java.lang.Math.round((double)fallDistance * 100.0D));
         }
 
         base.onLanding(fallDistance);

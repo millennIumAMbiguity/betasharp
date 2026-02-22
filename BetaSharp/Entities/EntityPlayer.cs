@@ -346,9 +346,9 @@ public abstract class EntityPlayer : EntityLiving
                 var4 = 0.02F;
                 var5 = random.NextFloat() * (float)System.Math.PI * 2.0F;
                 var4 *= random.NextFloat();
-                var3.velocityX += java.lang.Math.cos((double)var5) * (double)var4;
+                var3.velocityX += Math.Cos((double)var5) * (double)var4;
                 var3.velocityY += (double)((random.NextFloat() - random.NextFloat()) * 0.1F);
-                var3.velocityZ += java.lang.Math.sin((double)var5) * (double)var4;
+                var3.velocityZ += Math.Sin((double)var5) * (double)var4;
             }
 
             spawnItem(var3);
@@ -663,7 +663,7 @@ public abstract class EntityPlayer : EntityLiving
                 return SleepAttemptResult.NOT_POSSIBLE_NOW;
             }
 
-            if (java.lang.Math.abs(base.x - (double)x) > 3.0D || java.lang.Math.abs(base.y - (double)y) > 2.0D || java.lang.Math.abs(base.z - (double)z) > 3.0D)
+            if (Math.Abs(base.x - x) > 3.0D || Math.Abs(base.y - y) > 2.0D || Math.Abs(base.z - z) > 3.0D)
             {
                 return SleepAttemptResult.TOO_FAR_AWAY;
             }
@@ -909,7 +909,7 @@ public abstract class EntityPlayer : EntityLiving
             {
                 if (y > 0.0D)
                 {
-                    increaseStat(Stats.Stats.distanceClimbedStat, (int)java.lang.Math.round(y * 100.0D));
+                    increaseStat(Stats.Stats.distanceClimbedStat, (int)Math.Round(y * 100.0D));
                 }
             }
             else if (onGround)
@@ -973,7 +973,7 @@ public abstract class EntityPlayer : EntityLiving
     {
         if (fallDistance >= 2.0F)
         {
-            increaseStat(Stats.Stats.distanceFallenStat, (int)java.lang.Math.round((double)fallDistance * 100.0D));
+            increaseStat(Stats.Stats.distanceFallenStat, (int)Math.Round((double)fallDistance * 100.0D));
         }
 
         base.onLanding(fallDistance);

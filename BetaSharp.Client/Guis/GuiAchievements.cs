@@ -275,7 +275,7 @@ public class GuiAchievements : GuiScreen
                 }
                 else if (canUnlock)
                 {
-                    color = java.lang.Math.sin(java.lang.System.currentTimeMillis() % 600L / 600.0D * Math.PI * 2.0D) > 0.6D ?
+                    color = Math.Sin(java.lang.System.currentTimeMillis() % 600L / 600.0D * Math.PI * 2.0D) > 0.6D ?
                         Color.Blue :
                         Color.BlueAlpha;
                 }
@@ -315,7 +315,7 @@ public class GuiAchievements : GuiScreen
                 }
                 else if (statFileWriter.CanUnlockAchievement(var30))
                 {
-                    var35 = java.lang.Math.sin(java.lang.System.currentTimeMillis() % 600L / 600.0D * Math.PI * 2.0D) < 0.6D ? 0.6F : 0.8F;
+                    var35 = Math.Sin(java.lang.System.currentTimeMillis() % 600L / 600.0D * Math.PI * 2.0D) < 0.6D ? 0.6F : 0.8F;
                     GLManager.GL.Color4(var35, var35, var35, 1.0F);
                 }
                 else

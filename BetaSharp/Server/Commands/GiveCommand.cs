@@ -67,7 +67,7 @@ public class GiveCommand : ICommand
                 count = Math.Clamp(parsedCount, 1, 64);
             }
 
-            AdminCommands.LogCommand(c.Server, c.SenderName, $"Giving {targetPlayer.name} some {itemId}");
+            c.LogOp($"Giving {targetPlayer.name} some {itemId}");
             targetPlayer.dropItem(new ItemStack(itemId, count, 0));
             return;
         }

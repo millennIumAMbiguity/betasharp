@@ -24,7 +24,7 @@ public class KickCommand : ICommand
         if (targetPlayer != null)
         {
             targetPlayer.networkHandler.disconnect("Kicked by admin");
-            AdminCommands.LogCommand(c.Server, c.SenderName, "Kicking " + targetPlayer.name);
+            c.LogOp("Kicking " + targetPlayer.name);
         }
         else
         {

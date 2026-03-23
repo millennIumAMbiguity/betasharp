@@ -62,7 +62,7 @@ public class GameRuleCommand : ICommand
                 if (rules.TrySet(key, valueStr))
                 {
                     c.Output.SendMessage($"Game rule {ruleName} has been updated to {valueStr}");
-                    AdminCommands.LogCommand(c.Server, c.SenderName, $"Set game rule {ruleName} to {valueStr}");
+                    c.LogOp($"Set game rule {ruleName} to {valueStr}");
                 }
                 else
                 {

@@ -55,7 +55,7 @@ public class TeleportCommand : ICommand
             else
             {
                 source.networkHandler.teleport(target.x, target.y, target.z, target.yaw, target.pitch);
-                AdminCommands.LogCommand(c.Server, c.SenderName, "Teleporting " + c.Args[0] + " to " + c.Args[1] + ".");
+                c.LogOp("Teleporting " + c.Args[0] + " to " + c.Args[1] + ".");
             }
             return;
         }

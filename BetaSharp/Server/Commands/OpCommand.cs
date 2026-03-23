@@ -19,7 +19,7 @@ public class OpCommand : ICommand
 
         string target = c.Args[0];
         c.Server.playerManager.addToOperators(target);
-        AdminCommands.LogCommand(c.Server, c.SenderName, "Opping " + target);
+        c.LogOp("Opping " + target);
         c.Server.playerManager.messagePlayer(target, "§eYou are now op!");
     }
 }

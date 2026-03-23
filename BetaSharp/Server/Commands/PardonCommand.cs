@@ -19,6 +19,6 @@ public class PardonCommand : ICommand
 
         string target = c.Args[0];
         c.Server.playerManager.unbanPlayer(target);
-        AdminCommands.LogCommand(c.Server, c.SenderName, "Pardoning " + target);
+        c.LogOp("Pardoning " + target);
     }
 }

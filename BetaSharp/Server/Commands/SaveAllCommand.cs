@@ -11,7 +11,7 @@ public class SaveAllCommand : ICommand
 
     public void Execute(ICommand.CommandContext c)
     {
-        AdminCommands.LogCommand(c.Server, c.SenderName, "Forcing save..");
+        c.LogOp( "Forcing save..");
         c.Server.playerManager?.savePlayers();
 
         for (int i = 0; i < c.Server.worlds.Length; i++)
@@ -19,6 +19,6 @@ public class SaveAllCommand : ICommand
             c.Server.worlds[i].saveWithLoadingDisplay(true, null);
         }
 
-        AdminCommands.LogCommand(c.Server, c.SenderName, "Save complete.");
+        c.LogOp( "Save complete.");
     }
 }

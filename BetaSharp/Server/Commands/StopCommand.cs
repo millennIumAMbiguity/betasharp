@@ -12,7 +12,7 @@ public class StopCommand : ICommand
 
     public void Execute(ICommand.CommandContext c)
     {
-        AdminCommands.LogCommand(c.Server, c.SenderName, "Stopping the server..");
+        c.LogOp("Stopping the server..");
         c.Server.Stop();
     }
 }

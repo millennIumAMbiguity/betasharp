@@ -10,10 +10,6 @@ internal class ServerCommandHandler
 
     private readonly BetaSharpServer _server;
 
-    private delegate void CommandAction(BetaSharpServer server, string senderName, string[] args, ICommandOutput output);
-
-    [Obsolete("Use _commands instead")]
-    private readonly Dictionary<string, CommandAction> _commandsAction = new();
     private readonly Dictionary<string, ICommand> _commands = new();
     private readonly HelpCommand _helpCommand = new();
 
@@ -52,18 +48,6 @@ internal class ServerCommandHandler
             {
                 s_logger.LogInformation($"{senderName} tried command: {input}");
                 output.SendMessage($"§cYou do not have permission to use this command.");
-            }
-        }
-        else if (_commandsAction.TryGetValue(commandName, out var action))
-        {
-            if (isInternalServer || pendingCommand.Output.PermissionLevel > 0)
-            {
-                action(_server, senderName, args, output);
-            }
-            else
-            {
-                s_logger.LogInformation($"{senderName} tried command: {input}");
-                output.SendMessage("§cYou do not have permission to use this command.");
             }
         }
         else

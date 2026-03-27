@@ -6,8 +6,9 @@ namespace BetaSharp;
 
 public static class GameModes
 {
-    private static ILogger s_logger = Log.Instance.For(nameof(GameModes));
-    private static readonly ResourceLocation s_location = new(ResourceLocation.DefaultNamespace, "game_modes");
+    private static readonly ILogger s_logger = Log.Instance.For(nameof(GameModes));
+    // ReSharper disable once StringLiteralTypo
+    private static readonly ResourceLocation s_location = new(ResourceLocation.DefaultNamespace, "gamemode");
     private static readonly GameMode[] s_gameModes;
 
     static GameModes()

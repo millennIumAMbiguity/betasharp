@@ -66,7 +66,11 @@ public class ServerPlayerInteractionManager
 
     public void onBlockBreakingAction(int x, int y, int z, int direction)
     {
-        world.ExtinguishFire(null, x, y, z, direction);
+        if (player.GameMode.CanExhaustFire)
+        {
+            world.ExtinguishFire(null, x, y, z, direction);
+        }
+        if (!player.GameMode.CanBreak) return;
         failedMiningStartTime = tickCounter;
         int blockId = world.Reader.GetBlockId(x, y, z);
         if (blockId > 0)
@@ -148,12 +152,14 @@ public class ServerPlayerInteractionManager
 
     public bool tryBreakBlock(int x, int y, int z)
     {
+        if (!player.GameMode.CanBreak) return false;
+
         int blockId = world.Reader.GetBlockId(x, y, z);
         int blockMeta = world.Reader.GetBlockMeta(x, y, z);
         world.Broadcaster.WorldEvent(player, 2001, x, y, z, blockId + world.Reader.GetBlockMeta(x, y, z) * 256);
         bool success = finishMining(x, y, z);
 
-        if (success && player.canHarvest(Block.Blocks[blockId]))
+        if (success && player.GameMode.BlockDrops && player.canHarvest(Block.Blocks[blockId]))
         {
             Block.Blocks[blockId].onAfterBreak(new OnAfterBreakEvent(world, player, blockMeta, x, y, z));
             ((ServerPlayerEntity)player).networkHandler.sendPacket(BlockUpdateS2CPacket.Get(x, y, z, world));
@@ -198,6 +204,7 @@ public class ServerPlayerInteractionManager
     public bool interactBlock(EntityPlayer player, World world, ItemStack? stack, int x, int y, int z, int side)
     {
         if (!player.isSneaking()) {
+            if (!player.GameMode.CanInteract) return false;
             int blockId = world.Reader.GetBlockId(x, y, z);
             if (blockId > 0 && Block.Blocks[blockId].onUse(new OnUseEvent(world, player, x, y, z)))
             {
@@ -206,7 +213,7 @@ public class ServerPlayerInteractionManager
             }
         }
 
-        if (stack == null) return false;
+        if (stack == null || !player.GameMode.CanPlace) return false;
         if (stack.useOnBlock(player, world, x, y, z, side))
         {
             miningProgress = -1;

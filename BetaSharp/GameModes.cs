@@ -148,6 +148,7 @@ public static class GameModes
     {
         Id = 1,
         Name = "creative",
+        BrakeSpeed = 0f,
         CanReceiveDamage = false,
         FiniteResources = false,
         CanBeTargeted = false,

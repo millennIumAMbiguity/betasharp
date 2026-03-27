@@ -49,7 +49,7 @@ public class ServerPlayerInteractionManager
             {
                 Block block = Block.Blocks[blockId];
                 float breakProgress = block.getHardness(player) * (miningTicks + 1);
-                if (breakProgress >= 1.0F)
+                if (breakProgress >= player.GameMode.BrakeSpeed)
                 {
                     mining = false;
                     miningProgress = -1;
@@ -78,7 +78,7 @@ public class ServerPlayerInteractionManager
             Block.Blocks[blockId].onBlockBreakStart(new OnBlockBreakStartEvent(world, player, x, y, z));
         }
 
-        if (blockId > 0 && Block.Blocks[blockId].getHardness(player) >= 1.0F)
+        if (blockId > 0 && Block.Blocks[blockId].getHardness(player) >= player.GameMode.BrakeSpeed)
         {
             tryBreakBlock(x, y, z);
             miningProgress = -1;
@@ -102,7 +102,7 @@ public class ServerPlayerInteractionManager
             {
                 Block block = Block.Blocks[blockId];
                 float breakProgress = block.getHardness(player) * (ticksSinceFailedStart + 1) + miningProgress;
-                if (breakProgress >= 1F)
+                if (breakProgress >= player.GameMode.BrakeSpeed)
                 {
                     tryBreakBlock(x, y, z);
                     miningProgress = -1;

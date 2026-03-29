@@ -22,6 +22,7 @@ using BetaSharp.Client.Rendering.PostProcessing;
 using BetaSharp.Client.Resource;
 using BetaSharp.Client.Resource.Pack;
 using BetaSharp.Client.Sound;
+using BetaSharp.DataAsset;
 using BetaSharp.Entities;
 using BetaSharp.Items;
 using BetaSharp.Profiling;
@@ -260,6 +261,7 @@ public partial class BetaSharp
             _logger.LogError(ex, "Exception");
         }
 
+        var AssetLoaderTask = AssetLoader.LoadBaseAssets();
         texturePackList = new TexturePacks(this, new DirectoryInfo(gameDataDir));
         textureManager = new TextureManager(this, texturePackList, options);
         fontRenderer = new TextRenderer(options, textureManager);
@@ -349,6 +351,10 @@ public partial class BetaSharp
                 "minecraft/sounds/music/menu/floating_trees.ogg",
                 "minecraft/sounds/music/menu/beginning_2.ogg",
             ])).LoadAllAsync();
+
+        if (!AssetLoaderTask.IsCompleted)
+            AssetLoaderTask.Wait();
+        AssetLoader.LoadDatapackAssets(gameDataDir).Wait();
 
         checkGLError("Post startup");
         ingameGUI = new GuiIngame(this);

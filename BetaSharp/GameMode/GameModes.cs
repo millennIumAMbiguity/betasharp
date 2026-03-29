@@ -1,0 +1,97 @@
+﻿using System.Diagnostics.CodeAnalysis;
+using BetaSharp.DataAsset;
+using Microsoft.Extensions.Logging;
+
+namespace BetaSharp.GameMode;
+
+public static class GameModes
+{
+    public static GameMode DefaultGameMode { get; private set; } = null!;
+
+    private static readonly ILogger s_logger = Log.Instance.For(nameof(GameModes));
+
+    public static AssetLoader<GameMode> GameModesLoader { get; } = new("gamemode", LoadLocations.AllData);
+
+    // used to call constructor of our AssetLoader
+    internal static void Init()
+    {
+        // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
+        GameModesLoader.GetHashCode();
+    }
+
+
+    public static void SetDefaultGameMode(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            SetDefaultGameMode();
+        }
+        else if (!TrySetDefaultGameMode(name))
+        {
+            s_logger.LogError($"SetDefaultGameMode: Gamemode with name {name} not found.");
+        }
+    }
+
+    public static void SetDefaultGameMode()
+    {
+        if (TrySetDefaultGameMode("survival")) return;
+        if (TrySetDefaultGameMode("default")) return;
+
+        DefaultGameMode = GameModesLoader.Assets.First().Value;
+        s_logger.LogWarning($"SetDefaultGameMode: No default gamemode found. using {DefaultGameMode.Name}");
+    }
+
+    private static bool TrySetDefaultGameMode(string name)
+    {
+        if (TryGet(name, out var gameMode, true))
+        {
+            DefaultGameMode = gameMode;
+            return true;
+        }
+
+        return false;
+    }
+
+    public static GameMode Get(string name, bool shortName = false) =>
+        TryGet(name, out var gameMode, shortName) ? gameMode : throw new ArgumentException($"Game mode with name {name} not found.");
+
+    public static bool TryGet(string name, [NotNullWhen(true)] out GameMode? gameMode, bool shortName = false) =>
+        GameModesLoader.TryGet(name, out gameMode, shortName);
+
+    private static GameMode NewSurvivalGameMode() => new()
+    {
+        Name = "survival",
+    };
+
+    private static GameMode NewCreativeGameMode() => new()
+    {
+        Name = "creative",
+        BrakeSpeed = 0f,
+        CanReceiveDamage = false,
+        FiniteResources = false,
+        CanBeTargeted = false,
+        BlockDrops = false,
+    };
+
+    private static GameMode NewAdventureGameMode() => new()
+    {
+        Name = "adventure",
+        CanBreak = false,
+        CanPlace = false,
+    };
+
+    private static GameMode NewSpectatorGameMode() => new()
+    {
+        Name = "spectator",
+        CanBreak = false,
+        CanPlace = false,
+        CanInteract = false,
+        CanReceiveDamage = false,
+        CanInflictDamage = false,
+        CanBeTargeted = false,
+        CanExhaustFire = false,
+        CanPickup =  false,
+        CanDrop =  false,
+        VisibleToWorld = false,
+    };
+}

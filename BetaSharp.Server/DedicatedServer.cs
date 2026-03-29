@@ -1,4 +1,5 @@
 using System.Net;
+using BetaSharp.DataAsset;
 using BetaSharp.Server.Network;
 using BetaSharp.Server.Threading;
 using Microsoft.Extensions.Logging;
@@ -66,6 +67,8 @@ internal class DedicatedServer(IServerConfiguration config) : BetaSharpServer(co
             s_logger.LogWarning("To change this, set \"online-mode\" to \"true\" in the server.settings file.");
         }
 
+        AssetLoader.LoadBaseAssets().Wait();
+        AssetLoader.LoadDatapackAssets(null).Wait();
         return base.Init();
     }
 

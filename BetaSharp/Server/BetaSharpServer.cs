@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using BetaSharp.DataAsset;
+using BetaSharp.GameMode;
 using BetaSharp.Network.Packets.S2CPlay;
 using BetaSharp.Server.Command;
 using BetaSharp.Server.Entities;
@@ -123,7 +125,9 @@ public abstract class BetaSharpServer : ICommandOutput
     private void loadWorld(string worldDir, WorldSettings settings)
     {
         worlds = new ServerWorld[2];
-        RegionWorldStorage worldStorage = new(GetFile(".").FullName, worldDir, true);
+        var dir = new DirectoryInfo(Path.Combine(GetFile(".").FullName, worldDir));
+        RegionWorldStorage worldStorage = new(dir, true);
+        var LoadWorldAssetsTask = AssetLoader.LoadWorldAssets(dir.FullName);
 
         for (int i = 0; i < worlds.Length; i++)
         {
@@ -214,6 +218,9 @@ public abstract class BetaSharpServer : ICommandOutput
                 _logger.LogInformation("  Level {Level} lighting: {ElapsedMs}ms", i, sw3.ElapsedMilliseconds);
             }
         }
+
+        if (!LoadWorldAssetsTask.IsCompleted)
+            LoadWorldAssetsTask.Wait();
 
         clearProgress();
     }

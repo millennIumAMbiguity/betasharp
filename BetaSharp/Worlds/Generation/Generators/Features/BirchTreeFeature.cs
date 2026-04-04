@@ -10,7 +10,7 @@ internal class BirchTreeFeature : Feature
     {
         int treeHeight = rand.NextInt(3) + 5;
         bool canPlace = true;
-        if (!(y >= 1 && y + treeHeight + 1 <= 256))
+        if (!(y >= 1 && y + treeHeight + 1 <= level.Properties.WorldHeight))
         {
             return false;
         }
@@ -34,7 +34,7 @@ internal class BirchTreeFeature : Feature
             {
                 for (int cz = z - checkRadius; cz <= z + checkRadius && canPlace; ++cz)
                 {
-                    if (cy >= 0 && cy < 256)
+                    if (cy >= 0 && cy < level.Properties.WorldHeight)
                     {
                         int blockId = level.Reader.GetBlockId(cx, cy, cz);
                         if (blockId != 0 && blockId != Block.Leaves.id)
@@ -56,7 +56,7 @@ internal class BirchTreeFeature : Feature
         }
 
         int soilId = level.Reader.GetBlockId(x, y - 1, z);
-        if ((soilId == Block.GrassBlock.id || soilId == Block.Dirt.id) && y < 256 - treeHeight - 1)
+        if ((soilId == Block.GrassBlock.id || soilId == Block.Dirt.id) && y < level.Properties.WorldHeight - treeHeight - 1)
         {
             level.Writer.SetBlockWithoutNotifyingNeighbors(x, y - 1, z, Block.Dirt.id, 0, false);
 

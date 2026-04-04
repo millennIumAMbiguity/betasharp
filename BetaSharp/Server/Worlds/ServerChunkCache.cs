@@ -20,7 +20,7 @@ public class ServerChunkCache : IChunkSource
 
     public ServerChunkCache(ServerWorld world, IChunkStorage storage, IChunkSource generator)
     {
-        _empty = new EmptyChunk(world, new byte[65536], 0, 0);
+        _empty = new EmptyChunk(world, new byte[world.Properties.ChunkSize], 0, 0);
         _world = world;
         _storage = storage;
         _generator = generator;

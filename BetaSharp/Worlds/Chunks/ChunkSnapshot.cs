@@ -1,4 +1,5 @@
 using System.Buffers;
+using BetaSharp.Worlds.Core;
 
 namespace BetaSharp.Worlds.Chunks;
 
@@ -8,6 +9,7 @@ internal struct ChunkSnapshot : IDisposable
 
     private readonly ChunkNibbleArray _skylightMap;
     private readonly ChunkNibbleArray _blocklightMap;
+    private readonly IWorldChuckFormat _format;
 
     private readonly byte[] _blocks;
     private readonly ChunkNibbleArray _data;
@@ -15,24 +17,25 @@ internal struct ChunkSnapshot : IDisposable
 
     public ChunkSnapshot(Chunk toSnapshot)
     {
-        _blocks = ArrayPool<byte>.Shared.Rent(65536);
+        _format = toSnapshot.World.WorldChuckFormat;
+        _blocks = ArrayPool<byte>.Shared.Rent(toSnapshot.Blocks.Length);
         Buffer.BlockCopy(toSnapshot.Blocks, 0, _blocks, 0, toSnapshot.Blocks.Length);
 
-        _data = MakeNibbleArray(toSnapshot.Meta.Bytes);
-        _skylightMap = MakeNibbleArray(toSnapshot.SkyLight.Bytes);
-        _blocklightMap = MakeNibbleArray(toSnapshot.BlockLight.Bytes);
+        _data = MakeNibbleArray(_format, toSnapshot.Meta.Bytes);
+        _skylightMap = MakeNibbleArray(_format, toSnapshot.SkyLight.Bytes);
+        _blocklightMap = MakeNibbleArray(_format, toSnapshot.BlockLight.Bytes);
     }
 
-    private static ChunkNibbleArray MakeNibbleArray(byte[] toCopy)
+    private static ChunkNibbleArray MakeNibbleArray(IWorldChuckFormat format, byte[] toCopy)
     {
         byte[] bytes = ArrayPool<byte>.Shared.Rent(toCopy.Length);
         Buffer.BlockCopy(toCopy, 0, bytes, 0, toCopy.Length);
-        return new(bytes);
+        return new(format, bytes);
     }
 
     public readonly int GetBlockID(int x, int y, int z)
     {
-        return _blocks[x << 12 | z << 8 | y] & 255;
+        return _blocks[_format.GetIndex(x, y, z)];
     }
 
     public readonly int GetBlockMetadata(int x, int y, int z)

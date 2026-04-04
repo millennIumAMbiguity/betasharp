@@ -27,6 +27,8 @@ public abstract class World : IWorldContext
 
     public readonly Dimension Dimension;
 
+    public IWorldChuckFormat WorldChuckFormat { get; }
+
     private int _lcgBlockSeed = System.Random.Shared.Next();
     private int _soundCounter = System.Random.Shared.Next(12000);
     private bool _spawnHostileMobs = true;
@@ -44,20 +46,15 @@ public abstract class World : IWorldContext
 
         WorldProperties? loadedProperties = worldStorage.LoadProperties();
         bool shouldInitializeSpawn = loadedProperties == null;
-        if (loadedProperties == null)
-        {
-            Properties = new WorldProperties(settings, levelName);
-        }
-        else
-        {
-            Properties = loadedProperties;
-        }
+        Properties = loadedProperties ?? new WorldProperties(settings, levelName);
+
+        WorldChuckFormat = Properties.WorldHeight <= 128 ? new JavaChuckFormat() : new YxzChuckFormat();
 
         if (dim != null)
         {
             Dimension = dim;
         }
-        else if (Properties != null && Properties.Dimension == -1)
+        else if (Properties.Dimension == -1)
         {
             Dimension = Dimension.FromId(-1);
         }
@@ -65,10 +62,6 @@ public abstract class World : IWorldContext
         {
             Dimension = Dimension.FromId(0);
         }
-
-
-
-
 
 
         if (Dimension is OverworldDimension && Properties.TerrainType == WorldType.Sky)
@@ -87,7 +80,7 @@ public abstract class World : IWorldContext
             ? RuleSet.FromNBT(RuleRegistry.Instance, Properties.RulesTag)
             : new RuleSet(RuleRegistry.Instance);
 
-        BlockHost = new ChunkHost(chunkSource);
+        BlockHost = new ChunkHost(chunkSource, Properties.WorldHeight);
         Reader = new WorldReader(this, Dimension);
         Writer = new WorldWriter(BlockHost, Reader);
         Writer.OnBlockChanged += BlockUpdate;
@@ -575,7 +568,7 @@ public abstract class World : IWorldContext
                 int worldZ = localZ + worldZBase;
                 int worldY = Reader.GetTopSolidBlockY(worldX, worldZ);
 
-                if (GetBiomeSource().GetBiome(worldX, worldZ).GetEnableSnow() && worldY >= 0 && worldY < 256 &&
+                if (GetBiomeSource().GetBiome(worldX, worldZ).GetEnableSnow() && worldY >= 0 && worldY < Properties.WorldHeight &&
                     currentChunk.GetLight(LightType.Block, localX, worldY, localZ) < 10)
                 {
                     int blockBelowId = currentChunk.GetBlockId(localX, worldY - 1, localZ);
@@ -603,7 +596,7 @@ public abstract class World : IWorldContext
                 int localZ = (randomTickVal >> 8) & 15;
                 int localY = (randomTickVal >> 16) & 127;
 
-                int blockId = currentChunk.Blocks[(localX << 12) | (localZ << 8) | localY] & 255;
+                int blockId = currentChunk.Blocks[WorldChuckFormat.GetIndex(localX, localY, localZ)];
                 if (Block.BlocksRandomTick[blockId])
                 {
                     Block.Blocks[blockId].onTick(new OnTickEvent(this, localX + worldXBase, localY, localZ + worldZBase, currentChunk.GetBlockMeta(localX, localY, localZ), blockId));
@@ -647,7 +640,7 @@ public abstract class World : IWorldContext
 
         int currentBufferOffset = 0;
         int minY = Math.Max(0, y);
-        int maxY = Math.Min(256, y + sizeY);
+        int maxY = Math.Min(Properties.WorldHeight, y + sizeY);
 
         for (int chunkX = startChunkX; chunkX <= endChunkX; ++chunkX)
         {

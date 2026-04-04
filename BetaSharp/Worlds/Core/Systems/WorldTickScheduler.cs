@@ -39,7 +39,7 @@ public class WorldTickScheduler
     {
         const byte loadRadius = 8;
         int minY = Math.Max(0, y - loadRadius);
-        int maxY = Math.Min(255, y + loadRadius);
+        int maxY = Math.Min(_context.Properties.WorldHeight -1, y + loadRadius);
 
         if (!_context.ChunkHost.IsPosLoaded(x - loadRadius, minY, z - loadRadius) ||
             !_context.ChunkHost.IsPosLoaded(x + loadRadius, maxY, z + loadRadius))
@@ -83,6 +83,7 @@ public class WorldTickScheduler
         {
             int proportionalLimit = Math.Clamp(_scheduledUpdates.Count / 10, 1000, 8192);
             int maxTicksPerFrame = forceFlush ? _scheduledUpdates.Count : proportionalLimit;
+            int h = _context.Properties.WorldHeight - 1;
 
             for (int i = 0; i < maxTicksPerFrame; ++i)
             {
@@ -95,7 +96,7 @@ public class WorldTickScheduler
 
                 const byte loadRadius = 8;
                 int minY = Math.Max(0, blockUpdate.Y - loadRadius);
-                int maxY = Math.Min(255, blockUpdate.Y + loadRadius);
+                int maxY = Math.Min(h, blockUpdate.Y + loadRadius);
 
                 bool posLoaded = _context.Reader.IsPosLoaded(blockUpdate.X - loadRadius, minY, blockUpdate.Z - loadRadius) &&
                                  _context.Reader.IsPosLoaded(blockUpdate.X + loadRadius, maxY, blockUpdate.Z + loadRadius);

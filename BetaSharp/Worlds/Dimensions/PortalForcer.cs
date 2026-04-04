@@ -111,6 +111,7 @@ internal class PortalForcer
         int bestDirection = 0;
 
         int randomDirection = Random.Shared.Next(4);
+        int h1 = world.Properties.WorldHeight - 1;
 
         // Phase 1: Search for an optimal flat 3x4 area of solid ground
         for (int x = entityX - searchRadius; x <= entityX + searchRadius; ++x)
@@ -121,7 +122,7 @@ internal class PortalForcer
             {
                 double dz = z + 0.5D - entity.z;
 
-                for (int y = 255; y >= 0; --y)
+                for (int y = h1; y >= 0; --y)
                 {
                     if (world.Reader.IsAir(x, y, z))
                     {
@@ -189,7 +190,7 @@ internal class PortalForcer
                 {
                     double dz = z + 0.5D - entity.z;
 
-                    for (int y = 255; y >= 0; --y)
+                    for (int y = h1; y >= 0; --y)
                     {
                         if (world.Reader.IsAir(x, y, z))
                         {

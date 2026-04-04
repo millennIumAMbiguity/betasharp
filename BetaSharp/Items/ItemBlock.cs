@@ -65,7 +65,7 @@ internal class ItemBlock : Item
             return false;
         }
 
-        if (y == 255 && Block.Blocks[blockID].material.IsSolid)
+        if (y == world.Properties.WorldHeight - 1 && Block.Blocks[blockID].material.IsSolid)
         {
             return false;
         }

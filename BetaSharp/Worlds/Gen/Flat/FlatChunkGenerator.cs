@@ -49,23 +49,23 @@ internal class FlatChunkGenerator : IChunkSource
 
     public Chunk GetChunk(int chunkX, int chunkZ)
     {
-        byte[] blocks = new byte[65536];
-        ChunkNibbleArray meta = new(65536);
+        int blockL = 16 * 16 * _world.Properties.WorldHeight;
+        byte[] blocks = new byte[blockL];
+        ChunkNibbleArray meta = new(_world.WorldChuckFormat, blockL);
 
         foreach (FlatLayerInfo layer in _generatorInfo.FlatLayers)
         {
             int blockId = layer.FillBlock;
             int blockMeta = layer.FillBlockMeta;
 
-            for (int y = layer.MinY; y < layer.MinY + layer.LayerCount; ++y)
+            for (int y = layer.MinY; y < layer.MinY + layer.LayerCount & y < _world.Properties.WorldHeight; ++y)
             {
-                if (y >= 256) break;
 
                 for (int x = 0; x < 16; ++x)
                 {
                     for (int z = 0; z < 16; ++z)
                     {
-                        int index = x << 12 | z << 8 | y;
+                        int index = _world.WorldChuckFormat.GetIndex(x, y, z);
                         blocks[index] = (byte)blockId;
                         if (blockMeta > 0)
                         {

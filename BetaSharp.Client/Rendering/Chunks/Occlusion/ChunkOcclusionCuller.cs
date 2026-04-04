@@ -42,7 +42,7 @@ public class ChunkOcclusionCuller
         public bool IsEmpty => _read == _write;
     }
 
-    private readonly ChunkQueue[] _queues = [new(65536), new(65536)];
+    private readonly ChunkQueue[] _queues = [new(32768), new(32768)];
     private int _currentQueue = 0;
 
     public void FindVisible(

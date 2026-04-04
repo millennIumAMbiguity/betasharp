@@ -317,7 +317,7 @@ public class ServerPlayerEntity : EntityPlayer, ScreenHandlerListener
     {
         int worldX = chunkPos.X * 16;
         int worldZ = chunkPos.Z * 16;
-        networkHandler.sendPacket(ChunkDataS2CPacket.Get(worldX, 0, worldZ, 16, 256, 16, world));
+        networkHandler.sendPacket(ChunkDataS2CPacket.Get(worldX, 0, worldZ, 16, world.Properties.WorldHeight, 16, world));
     }
 
     private void SendBlockEntityUpdates(IWorldContext world, ChunkPos chunkPos)
@@ -327,7 +327,7 @@ public class ServerPlayerEntity : EntityPlayer, ScreenHandlerListener
         int endX = startX + 16;
         int endZ = startZ + 16;
 
-        var blockEntities = world.Entities.GetBlockEntities(startX, 0, startZ, endX, 256, endZ);
+        var blockEntities = world.Entities.GetBlockEntities(startX, 0, startZ, endX, world.Properties.WorldHeight, endZ);
         foreach (BlockEntity blockEntity in blockEntities)
         {
             updateBlockEntity(blockEntity);

@@ -15,7 +15,7 @@ internal class SpruceTreeFeature : Feature
 
         bool canPlace = true;
 
-        if (!(y >= 1 && y + totalHeight + 1 <= 256))
+        if (!(y >= 1 && y + totalHeight + 1 <= level.Properties.WorldHeight))
         {
             return false;
         }
@@ -36,7 +36,7 @@ internal class SpruceTreeFeature : Feature
             {
                 for (int cz = z - checkRadius; cz <= z + checkRadius && canPlace; ++cz)
                 {
-                    if (cy >= 0 && cy < 256)
+                    if (cy >= 0 && cy < level.Properties.WorldHeight)
                     {
                         int blockId = level.Reader.GetBlockId(cx, cy, cz);
                         if (blockId != 0 && blockId != Block.Leaves.id)
@@ -58,7 +58,7 @@ internal class SpruceTreeFeature : Feature
         }
 
         int groundId = level.Reader.GetBlockId(x, y - 1, z);
-        if (!((groundId == Block.GrassBlock.id || groundId == Block.Dirt.id) && y < 256 - totalHeight - 1))
+        if (!((groundId == Block.GrassBlock.id || groundId == Block.Dirt.id) && y < level.Properties.WorldHeight - totalHeight - 1))
         {
             return false;
         }

@@ -153,17 +153,10 @@ internal class RegionChunkStorage : IChunkStorage
 
     public static Chunk LoadChunkFromNbt(IWorldContext world, NBTTagCompound nbt)
     {
-        int chunkX = nbt.GetInteger("xPos");
-        int chunkZ = nbt.GetInteger("zPos");
-        Chunk chunk = new(world, chunkX, chunkZ)
-        {
-            Blocks = nbt.GetByteArray("Blocks"),
-            Meta = new ChunkNibbleArray(nbt.GetByteArray("Data")),
-            SkyLight = new ChunkNibbleArray(nbt.GetByteArray("SkyLight")),
-            BlockLight = new ChunkNibbleArray(nbt.GetByteArray("BlockLight")),
-            HeightMap = nbt.GetByteArray("HeightMap"),
-            TerrainPopulated = nbt.GetBoolean("TerrainPopulated")
-        };
+        Chunk chunk = new(world, nbt);
+        int chunkX = chunk.X;
+        int chunkZ = chunk.Z;
+
         if (!chunk.Meta.IsInitialized)
         {
             chunk.Meta = new ChunkNibbleArray(chunk.Blocks.Length);
@@ -171,15 +164,15 @@ internal class RegionChunkStorage : IChunkStorage
 
         if (chunk.HeightMap == null || !chunk.SkyLight.IsInitialized)
         {
-            chunk.HeightMap = new byte[256];
             chunk.SkyLight = new ChunkNibbleArray(chunk.Blocks.Length);
             chunk.PopulateHeightMap();
         }
-        else if (chunk.HeightMap.Length == 256)
+        else if (chunk.HeightMap.Length == world.Properties.WorldHeight)
         {
-            for (int i = 0; i < 256; i++)
+            int h = world.Properties.WorldHeight - 1;
+            foreach (byte height in chunk.HeightMap)
             {
-                if (chunk.HeightMap[i] > 127)
+                if (height > h)
                 {
                     chunk.PopulateHeightMapOnly();
                     break;
@@ -253,7 +246,7 @@ internal class RegionChunkStorage : IChunkStorage
                 int x = tickTag.GetInteger("x");
                 int y = tickTag.GetInteger("y");
                 int z = tickTag.GetInteger("z");
-                if (y < 0 || y > 127 || x < minWx || x > maxWx || z < minWz || z > maxWz)
+                if (y < 0 || y >= world.Properties.WorldHeight || x < minWx || x > maxWx || z < minWz || z > maxWz)
                 {
                     Log.Instance.For<RegionChunkStorage>().LogDebug("Skipping TileTicks entry with out-of-range coordinates ({X},{Y},{Z}) for chunk {ChunkX},{ChunkZ}", x, y, z, chunkX, chunkZ);
                     continue;

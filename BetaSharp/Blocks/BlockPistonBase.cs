@@ -308,11 +308,13 @@ public class BlockPistonBase : Block
         int checkZ = z + PistonConstants.HEAD_OFFSET_Z[dir];
         int pushCount = 0;
 
+        int h = ctx.Properties.WorldHeight - 1;
+
         while (true)
         {
             if (pushCount < 13)
             {
-                if (checkY <= 0 || checkY >= 127)
+                if (checkY <= 0 || checkY >= h)
                 {
                     return false;
                 }
@@ -352,12 +354,14 @@ public class BlockPistonBase : Block
         int nextZ = z + PistonConstants.HEAD_OFFSET_Z[dir];
         int pushCount = 0;
 
+        int h = ctx.Properties.WorldHeight - 1;
+
         while (true)
         {
             int blockId;
             if (pushCount < 13)
             {
-                if (nextY <= 0 || nextY >= 127)
+                if (nextY <= 0 || nextY >= h)
                 {
                     return false;
                 }

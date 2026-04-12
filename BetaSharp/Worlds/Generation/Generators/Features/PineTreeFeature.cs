@@ -15,7 +15,7 @@ internal class PineTreeFeature : Feature
 
         bool canPlace = true;
 
-        if (!(y >= 1 && y + treeHeight + 1 <= 128))
+        if (!(y >= 1 && y + treeHeight + 1 <= level.Properties.WorldHeight))
         {
             return false;
         }
@@ -37,7 +37,7 @@ internal class PineTreeFeature : Feature
             {
                 for (int cz = z - checkRadius; cz <= z + checkRadius && canPlace; ++cz)
                 {
-                    if (cy >= 0 && cy < 128)
+                    if (cy >= 0 && cy < level.Properties.WorldHeight)
                     {
                         int blockId = level.Reader.GetBlockId(cx, cy, cz);
                         if (blockId != 0 && blockId != Block.Leaves.id)
@@ -59,7 +59,7 @@ internal class PineTreeFeature : Feature
         }
 
         int groundId = level.Reader.GetBlockId(x, y - 1, z);
-        if ((groundId == Block.GrassBlock.id || groundId == Block.Dirt.id) && y < 128 - treeHeight - 1)
+        if ((groundId == Block.GrassBlock.id || groundId == Block.Dirt.id) && y < level.Properties.WorldHeight - treeHeight - 1)
         {
             level.Writer.SetBlockWithoutNotifyingNeighbors(x, y - 1, z, Block.Dirt.id, 0, false);
             int currentLeafRadius = 0;

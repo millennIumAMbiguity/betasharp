@@ -41,7 +41,7 @@ internal struct LightUpdate
         }
 
         int startY = MinY < 0 ? 0 : MinY;
-        int endY = MaxY >= 128 ? 127 : MaxY;
+        int endY = MaxY >= lighting.WorldHeight ? lighting.WorldHeight - 1 : MaxY;
 
         int cachedChunkX = 0;
         int cachedChunkZ = 0;

@@ -243,18 +243,17 @@ public class WorldRenderer : IWorldEventListener
                 }
                 if (var7.shouldRender(var1) && (var7.ignoreFrustumCheck || culler.IsBoundingBoxInFrustum(var7.boundingBox)) && (var7 != _game.Camera || _game.Options.CameraMode != EnumCameraMode.FirstPerson || _game.Camera.isSleeping()))
                 {
-                    int var8 = MathHelper.Floor(var7.y);
-                    if (var8 < 0)
+                    int yFloor = MathHelper.Floor(var7.y);
+                    if (yFloor < 0)
                     {
-                        var8 = 0;
+                        yFloor = 0;
+                    }
+                    else if (yFloor >= _world.Properties.WorldHeight)
+                    {
+                        yFloor = _world.Properties.WorldHeight - 1;
                     }
 
-                    if (var8 >= 128)
-                    {
-                        var8 = 127;
-                    }
-
-                    if (_world.Reader.IsPosLoaded(MathHelper.Floor(var7.x), var8, MathHelper.Floor(var7.z)))
+                    if (_world.Reader.IsPosLoaded(MathHelper.Floor(var7.x), yFloor, MathHelper.Floor(var7.z)))
                     {
                         ++CountEntitiesRendered;
                         EntityRenderDispatcher.Instance.RenderEntity(var7, var3);

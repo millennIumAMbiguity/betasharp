@@ -641,6 +641,8 @@ internal class OverworldChunkGenerator : CommonChunkGenerator, IChunkSource
         _gravelBuffer = _sandGravelNoise.create(_gravelBuffer, chunkX * 16, 109.0134D, chunkZ * 16, 16, 1, 16, oneThirtySecond, 1.0D, oneThirtySecond);
         _depthBuffer = _depthNoise.create(_depthBuffer, chunkX * 16, chunkZ * 16, 0.0D, 16, 16, 1, oneThirtySecond * 2.0D, oneThirtySecond * 2.0D, oneThirtySecond * 2.0D);
 
+        int maxHeight = Math.Min(_world.Properties.WorldHeight, ChuckFormat.ChunkHeight) - 1;
+
         for (int localX = 0; localX < 16; ++localX)
         {
             for (int localZ = 0; localZ < 16; ++localZ)
@@ -653,7 +655,7 @@ internal class OverworldChunkGenerator : CommonChunkGenerator, IChunkSource
                 byte topBlock = localBiome.TopBlockId;
                 byte soilBlock = localBiome.SoilBlockId;
 
-                for (int blockY = ChuckFormat.ChunkHeight - 1; blockY >= 0; --blockY)
+                for (int blockY = maxHeight; blockY >= 0; --blockY)
                 {
                     int blockIndex = (localZ * 16 + localX) * ChuckFormat.ChunkHeight + blockY;
                     // Generate Bedrock floor

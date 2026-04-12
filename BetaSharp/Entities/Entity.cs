@@ -547,10 +547,10 @@ public abstract class Entity
                     if (horizontalSpeed > (float)nextStepSoundDistance && var28 > 0)
                     {
                         nextStepSoundDistance = (int)horizontalSpeed + 1;
-                        BlockSoundGroup soundGroup = Block.Blocks[var28].soundGroup;
+                        BlockSoundGroup soundGroup = Block.Blocks[var28].SoundGroup;
                         if (world.Reader.GetBlockId(var38, var26 + 1, var39) == Block.Snow.id)
                         {
-                            soundGroup = Block.Snow.soundGroup;
+                            soundGroup = Block.Snow.SoundGroup;
                             world.Broadcaster.PlaySoundAtEntity(this, soundGroup.StepSound, soundGroup.Volume * 0.15F, soundGroup.Pitch);
                         }
                         else if (!Block.Blocks[var28].material.IsFluid)
@@ -906,7 +906,7 @@ public abstract class Entity
         velocityModified = true;
     }
 
-    public virtual bool damage(Entity entity, int amount)
+    public virtual bool damage(Entity? entity, int amount)
     {
         scheduleVelocityUpdate();
         return false;
@@ -1020,7 +1020,7 @@ public abstract class Entity
 
     public abstract void writeNbt(NBTTagCompound nbt);
 
-    protected NBTTagList newDoubleNBTList(params double[] var1)
+    protected static NBTTagList newDoubleNBTList(params double[] var1)
     {
         NBTTagList var2 = new();
         double[] var3 = var1;
@@ -1035,7 +1035,7 @@ public abstract class Entity
         return var2;
     }
 
-    protected NBTTagList newFloatNBTList(params float[] var1)
+    protected static NBTTagList newFloatNBTList(params float[] var1)
     {
         NBTTagList var2 = new();
         float[] var3 = var1;

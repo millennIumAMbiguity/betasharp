@@ -130,7 +130,7 @@ public class EntityClientPlayerMP : ClientPlayerEntity
         if (!Game.Player.GameMode.CanDrop) return;
 
         var selected = getHand();
-        if (selected != null && selected.count > 0)
+        if (selected != null && selected.Count > 0)
         {
             increaseStat(Stats.Stats.DropStat, 1);
         }
@@ -170,7 +170,7 @@ public class EntityClientPlayerMP : ClientPlayerEntity
     public override void closeHandledScreen()
     {
         sendQueue.AddToSendQueue(CloseScreenS2CPacket.Get(currentScreenHandler.SyncId));
-        inventory.setItemStack(null);
+        inventory.SetCursorStack(null);
         base.closeHandledScreen();
     }
 

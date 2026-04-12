@@ -153,16 +153,16 @@ public class EntityWolf : EntityAnimal
             if (currentTarget is EntityPlayer)
             {
                 EntityPlayer targetPlayer = (EntityPlayer)currentTarget;
-                ItemStack heldItem = targetPlayer.inventory.getSelectedItem();
+                ItemStack heldItem = targetPlayer.inventory.GetItemInHand();
                 if (heldItem != null)
                 {
-                    if (!isWolfTamed() && heldItem.itemId == Item.Bone.id)
+                    if (!isWolfTamed() && heldItem.ItemId == Item.Bone.id)
                     {
                         looksWithInterest = true;
                     }
-                    else if (isWolfTamed() && Item.ITEMS[heldItem.itemId] is ItemFood)
+                    else if (isWolfTamed() && Item.ITEMS[heldItem.ItemId] is ItemFood)
                     {
-                        looksWithInterest = ((ItemFood)Item.ITEMS[heldItem.itemId]).getIsWolfsFavoriteMeat();
+                        looksWithInterest = ((ItemFood)Item.ITEMS[heldItem.ItemId]).getIsWolfsFavoriteMeat();
                     }
                 }
             }
@@ -403,15 +403,15 @@ public class EntityWolf : EntityAnimal
 
     public override bool interact(EntityPlayer player)
     {
-        ItemStack heldItem = player.inventory.getSelectedItem();
+        ItemStack heldItem = player.inventory.GetItemInHand();
         if (!isWolfTamed())
         {
-            if (heldItem != null && heldItem.itemId == Item.Bone.id && !isWolfAngry())
+            if (heldItem != null && heldItem.ItemId == Item.Bone.id && !isWolfAngry())
             {
                 heldItem.ConsumeItem(player);
-                if (heldItem.count <= 0)
+                if (heldItem.Count <= 0)
                 {
-                    player.inventory.setStack(player.inventory.selectedSlot, (ItemStack)null);
+                    player.inventory.SetStack(player.inventory.SelectedSlot, (ItemStack)null);
                 }
 
                 if (!world.IsRemote)
@@ -438,15 +438,15 @@ public class EntityWolf : EntityAnimal
         }
         else
         {
-            if (heldItem != null && Item.ITEMS[heldItem.itemId] is ItemFood)
+            if (heldItem != null && Item.ITEMS[heldItem.ItemId] is ItemFood)
             {
-                ItemFood food = (ItemFood)Item.ITEMS[heldItem.itemId];
+                ItemFood food = (ItemFood)Item.ITEMS[heldItem.ItemId];
                 if (food.getIsWolfsFavoriteMeat() && WolfHealth.Value < 20)
                 {
                     heldItem.ConsumeItem(player);
-                    if (heldItem.count <= 0)
+                    if (heldItem.Count <= 0)
                     {
-                        player.inventory.setStack(player.inventory.selectedSlot, (ItemStack)null);
+                        player.inventory.SetStack(player.inventory.SelectedSlot, (ItemStack)null);
                     }
 
                     heal(((ItemFood)Item.RawPorkchop).getHealAmount());

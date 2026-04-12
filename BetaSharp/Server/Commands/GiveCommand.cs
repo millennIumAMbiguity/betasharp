@@ -1,82 +1,91 @@
 using BetaSharp.Entities;
 using BetaSharp.Items;
 using BetaSharp.Server.Command;
+using Brigadier.NET.Builder;
+using Brigadier.NET.Context;
 
 namespace BetaSharp.Server.Commands;
 
-public class GiveCommand : ICommand
+public class GiveCommand : Command.Command
 {
-    public string Usage => "give [player] <item> [count]";
-    public string Description => "Gives yourself an item";
-    public string[] Names => ["give"];
+    public override string Usage => "give <player> <item> <count>";
+    public override string Description => "Gives yourself an item";
+    public override string[] Names => ["give"];
 
-    public void Execute(ICommand.CommandContext c)
+    public override LiteralArgumentBuilder<CommandSource> Register(LiteralArgumentBuilder<CommandSource> argBuilder) =>
+        argBuilder
+            .Then(ArgumentString("item")
+                .Executes(GiveItem)
+                .Then(ArgumentInt("count")
+                    .Executes(GiveItemCount)))
+            .Then(ArgumentPlayer("player")
+                .Then(ArgumentString("item")
+                    .Executes(GivePlayerItem)
+                    .Then(ArgumentInt("count")
+                        .Executes(GivePlayerItemCount))));
+
+    // give <item>  →  give 1 of item to self
+    private static int GiveItem(CommandContext<CommandSource> context)
     {
-        if (c.Args.Length <= 1)
+        string item = context.GetArgument<string>("item");
+
+        GiveTo(context.Source, item, 1);
+        return 1;
+    }
+
+    private static int GiveItemCount(CommandContext<CommandSource> context)
+    {
+        string item = context.GetArgument<string>("item");
+        int count = context.GetArgument<int>("count");
+
+        GiveTo(context.Source, item, count);
+        return 1;
+    }
+
+
+    private static int GivePlayerItem(CommandContext<CommandSource> context)
+    {
+        string item = context.GetArgument<string>("item");
+        ServerPlayerEntity player = context.GetArgument<ServerPlayerEntity>("player");
+
+        GiveTo(context.Source, player, item, 1);
+        return 1;
+    }
+
+    private static int GivePlayerItemCount(CommandContext<CommandSource> context)
+    {
+        string item = context.GetArgument<string>("item");
+        ServerPlayerEntity player = context.GetArgument<ServerPlayerEntity>("player");
+        int count = context.GetArgument<int>("count");
+
+        GiveTo(context.Source, player, item, count);
+        return 1;
+    }
+
+    private static void GiveTo(CommandSource source, string item, int count)
+    {
+        ServerPlayerEntity? sender = source.Server.playerManager.getPlayer(source.SenderName);
+        if (sender == null)
         {
-            c.Output.SendMessage($"Usage: {Usage}");
+            source.Output.SendMessage("Could not find your player.");
             return;
         }
-        else if (c.Args.Length >= 2)
+
+        GiveTo(source, sender, item, count);
+    }
+
+    private static void GiveTo(CommandSource source, ServerPlayerEntity target, string item, int count)
+    {
+        if (!ItemLookup.TryResolveItemId(item, out int itemId))
         {
-            ServerPlayerEntity? sender = c.Server.playerManager.getPlayer(c.SenderName);
-            if (sender == null)
-            {
-                c.Output.SendMessage("Could not find your player.");
-                return;
-            }
-
-            // give <item> [count] --> self
-            if (ItemLookup.TryResolveItemId(c.Args[0], out int selfItemId))
-            {
-
-                int count = 1;
-                if (c.Args.Length > 1 && int.TryParse(c.Args[1], out int parsedCount))
-                {
-                    count = Math.Clamp(parsedCount, 1, 64);
-                }
-
-                sender.inventory.AddItemStackToInventoryOrDrop(new ItemStack(selfItemId, count, 0));
-                c.LogOp($"{sender.name} Gave {count} [{selfItemId}] to {sender.name}");
-                c.Output.SendMessage($"Gave {count} [{selfItemId}] to {sender.name}");
-                return;
-            }
-            else // give [player] <item> [count] --> to player
-            {
-                string targetName = c.Args[0];
-                ServerPlayerEntity? targetPlayer = c.Server.playerManager.getPlayer(targetName);
-
-                if (targetPlayer == null)
-                {
-                    c.Output.SendMessage("Can't find user " + targetName);
-                    return;
-                }
-
-                if (!ItemLookup.TryResolveItemId(c.Args[1], out int itemId))
-                {
-                    c.Output.SendMessage("Unknown item: " + c.Args[1]);
-                    return;
-                }
-
-                if (Item.ITEMS[itemId] == null)
-                {
-                    c.Output.SendMessage("There's no item with id " + itemId);
-                    return;
-                }
-
-                int count = 1;
-                if (c.Args.Length > 2 && int.TryParse(c.Args[2], out int parsedCount))
-                {
-                    count = Math.Clamp(parsedCount, 1, 64);
-                }
-
-                c.LogOp($"Giving {targetPlayer.name} {count}x{itemId}");
-                targetPlayer.inventory.AddItemStackToInventoryOrDrop(new ItemStack(itemId, count, 0));
-                c.LogOp($"{sender} Gave {count} [{itemId}] to {targetPlayer.name}");
-                c.Output.SendMessage($"Gave {count} [{itemId}] to {targetPlayer.name}");
-                return;
-            }
+            source.Output.SendMessage("Unknown item: " + item);
+            return;
         }
-        return;
+
+        ItemStack stack = new(itemId, count, 0);
+        target.inventory.AddItemStackToInventoryOrDrop(stack);
+        string msg = $"Gave {count} [{ItemLookup.ResolveItemName(stack)}] to {target.name}";
+        source.LogOp($"{target.name} {msg}");
+        source.Output.SendMessage(msg);
     }
 }

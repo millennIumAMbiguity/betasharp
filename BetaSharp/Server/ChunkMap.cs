@@ -3,9 +3,7 @@ using BetaSharp.Blocks.Entities;
 using BetaSharp.Entities;
 using BetaSharp.Network.Packets;
 using BetaSharp.Network.Packets.S2CPlay;
-using BetaSharp.Util;
 using BetaSharp.Util.Maths;
-using BetaSharp.Worlds.Chunks;
 using BetaSharp.Worlds.Core;
 using Microsoft.Extensions.Logging;
 
@@ -107,7 +105,7 @@ internal class ChunkMap
         }
     }
 
-    private bool isWithinOldViewDistance(int chunkX, int chunkZ, int centerX, int centerZ, int oldDist)
+    private static bool isWithinOldViewDistance(int chunkX, int chunkZ, int centerX, int centerZ, int oldDist)
     {
         int dx = chunkX - centerX;
         int dz = chunkZ - centerZ;
@@ -165,10 +163,24 @@ internal class ChunkMap
 
     public void OnChunkDecorated(int chunkX, int chunkZ)
     {
-        long key = GetChunkHash(chunkX, chunkZ);
-        if (_chunkMapping.TryGetValue(key, out TrackedChunk? trackedChunk) && trackedChunk != null)
+        int[] dxs = [0, 1, 0, 1];
+        int[] dzs = [0, 0, 1, 1];
+
+        for (int c = 0; c < 4; c++)
         {
-            trackedChunk.EnqueueForTrackingPlayers();
+            int cx = chunkX + dxs[c];
+            int cz = chunkZ + dzs[c];
+
+            long key = GetChunkHash(cx, cz);
+            if (!_chunkMapping.TryGetValue(key, out TrackedChunk? trackedChunk) || trackedChunk == null) continue;
+
+            trackedChunk.updatePlayerChunks(0, 50, 0);
+            trackedChunk.updatePlayerChunks(15, 124, 15);
+
+            for (int i = 0; i < 8; i++)
+            {
+                trackedChunk.updatePlayerChunks(i, 64, i);
+            }
         }
     }
 
@@ -279,7 +291,7 @@ internal class ChunkMap
         return GetChunks(player, _viewDistance);
     }
 
-    private ReadOnlySpan<ChunkPos> GetChunks(ServerPlayerEntity player, int radius)
+    private static ReadOnlySpan<ChunkPos> GetChunks(ServerPlayerEntity player, int radius)
     {
         int playerChunkX = (int)player.x >> 4;
         int playerChunkZ = (int)player.z >> 4;
@@ -345,7 +357,7 @@ internal class ChunkMap
 
             if (player.activeChunks.Add(_chunkPos))
             {
-                player.networkHandler.sendPacket(ChunkStatusUpdateS2CPacket.Get(_chunkPos.X, _chunkPos.Z, true));
+                player.NetworkHandler.SendPacket(ChunkStatusUpdateS2CPacket.Get(_chunkPos.X, _chunkPos.Z, true));
             }
 
             player.ScheduleChunkSend(_chunkPos);
@@ -374,7 +386,7 @@ internal class ChunkMap
             {
                 if (_players.Count == 0)
                 {
-                    long var2 = ChunkMap.GetChunkHash(_chunkPos.X, _chunkPos.Z);
+                    long var2 = GetChunkHash(_chunkPos.X, _chunkPos.Z);
                     _chunkMap._chunkMapping.Remove(var2);
                     if (_dirtyBlockCount > 0)
                     {
@@ -386,7 +398,7 @@ internal class ChunkMap
 
                 if (player.activeChunks.Remove(_chunkPos))
                 {
-                    player.networkHandler.sendPacket(ChunkStatusUpdateS2CPacket.Get(_chunkPos.X, _chunkPos.Z, false));
+                    player.NetworkHandler.SendPacket(ChunkStatusUpdateS2CPacket.Get(_chunkPos.X, _chunkPos.Z, false));
                 }
 
                 player.CancelChunkSend(_chunkPos);
@@ -455,7 +467,7 @@ internal class ChunkMap
             {
                 if (serverPlayer.activeChunks.Contains(_chunkPos))
                 {
-                    serverPlayer.networkHandler.sendPacket(packet);
+                    serverPlayer.NetworkHandler.SendPacket(packet);
                 }
             }
             packet.Return();

@@ -543,7 +543,7 @@ public class Chunk
         {
             foreach (Entity entity in Entities[i])
             {
-                if (entity != except && entity.boundingBox.Intersects(box))
+                if (entity != except && entity.boundingBox.Intersects(box) && !entity.dead)
                 {
                     result.Add(entity);
                 }
@@ -563,7 +563,7 @@ public class Chunk
         {
             foreach (Entity entity in Entities[i])
             {
-                if (entity is T typedEntity && entity.boundingBox.Intersects(box))
+                if (!entity.dead && entity is T typedEntity && entity.boundingBox.Intersects(box))
                 {
                     result.Add(typedEntity);
                 }

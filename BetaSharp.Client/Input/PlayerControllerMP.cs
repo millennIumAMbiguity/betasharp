@@ -45,9 +45,9 @@ public class PlayerControllerMP : PlayerController
         if (hand != null)
         {
             hand.postMine(blockId, x, y, z, Game.Player);
-            if (hand.count == 0)
+            if (hand.Count == 0)
             {
-                hand.onRemoved(Game.Player);
+                ItemStack.onRemoved(Game.Player);
                 Game.Player.clearStackInHand();
             }
         }
@@ -116,7 +116,7 @@ public class PlayerControllerMP : PlayerController
                     curBlockDamageMP += var6.getHardness(Game.Player);
                     if (_mineSoundTimer % 4 == 0 && var6 != null)
                     {
-                        Game.SoundManager.PlaySound(var6.soundGroup.StepSound, (float)x + 0.5F, (float)y + 0.5F, (float)z + 0.5F, (var6.soundGroup.Volume + 1.0F) / 8.0F, var6.soundGroup.Pitch * 0.5F);
+                        Game.SoundManager.PlaySound(var6.SoundGroup.StepSound, (float)x + 0.5F, (float)y + 0.5F, (float)z + 0.5F, (var6.SoundGroup.Volume + 1.0F) / 8.0F, var6.SoundGroup.Pitch * 0.5F);
                     }
 
                     ++_mineSoundTimer;
@@ -168,7 +168,7 @@ public class PlayerControllerMP : PlayerController
 
     private void syncCurrentPlayItem()
     {
-        int var1 = Game.Player.inventory.selectedSlot;
+        int var1 = Game.Player.inventory.SelectedSlot;
         if (var1 != currentPlayerItem)
         {
             currentPlayerItem = var1;
@@ -188,7 +188,7 @@ public class PlayerControllerMP : PlayerController
     )
     {
         syncCurrentPlayItem();
-        netClientHandler.AddToSendQueue(PlayerInteractBlockC2SPacket.Get(blockX, blockY, blockZ, blockSide, player.inventory.getSelectedItem()));
+        netClientHandler.AddToSendQueue(PlayerInteractBlockC2SPacket.Get(blockX, blockY, blockZ, blockSide, player.inventory.GetItemInHand()));
         bool placed = base.sendPlaceBlock(player, world, selectedItem, blockX, blockY, blockZ, blockSide);
         return placed;
     }
@@ -196,7 +196,7 @@ public class PlayerControllerMP : PlayerController
     public override bool sendUseItem(EntityPlayer var1, World var2, ItemStack var3)
     {
         syncCurrentPlayItem();
-        netClientHandler.AddToSendQueue(PlayerInteractBlockC2SPacket.Get(-1, -1, -1, 255, var1.inventory.getSelectedItem()));
+        netClientHandler.AddToSendQueue(PlayerInteractBlockC2SPacket.Get(-1, -1, -1, 255, var1.inventory.GetItemInHand()));
         bool var4 = base.sendUseItem(var1, var2, var3);
         return var4;
     }

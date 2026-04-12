@@ -65,7 +65,7 @@ internal class NetherChunkGenerator : CommonChunkGenerator, IChunkSource
 
     public void DecorateTerrain(IChunkSource source, int x, int z)
     {
-        BlockSand.fallInstantly = true;
+        BlockSand.FallInstantly = true;
         int blockX = x * 16;
         int blockZ = z * 16;
 
@@ -126,7 +126,7 @@ internal class NetherChunkGenerator : CommonChunkGenerator, IChunkSource
             _featureRedMushroom.Generate(_world, _random, featureX, featureY, featureZ);
         }
 
-        BlockSand.fallInstantly = false;
+        BlockSand.FallInstantly = false;
     }
 
     public bool Save(bool bl, LoadingDisplay display) => true;
@@ -447,7 +447,7 @@ internal class NetherChunkGenerator : CommonChunkGenerator, IChunkSource
         return heightMap;
     }
 
-    public void markChunksForUnload(int _)
+    public static void markChunksForUnload(int _)
     {
     }
 }

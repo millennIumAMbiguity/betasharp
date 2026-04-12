@@ -4,11 +4,12 @@ using BetaSharp.Blocks.Materials;
 using BetaSharp.Inventorys;
 using BetaSharp.Items;
 using BetaSharp.NBT;
+using BetaSharp.Registries;
 using BetaSharp.Screens;
 using BetaSharp.Stats;
 using BetaSharp.Util.Maths;
-using BetaSharp.Worlds.Core.Systems;
 using BetaSharp.Worlds.Chunks;
+using BetaSharp.Worlds.Core.Systems;
 
 namespace BetaSharp.Entities;
 
@@ -46,7 +47,18 @@ public abstract class EntityPlayer : EntityLiving
     public float lastScreenDistortion;
     private int damageSpill;
     public EntityFish fishHook = null;
-    public GameMode GameMode;
+
+    /// <summary>
+    /// The player's current game mode value. All reads go through the holder, so if the
+    /// server resyncs registry data the value updates in-place without requiring a
+    /// separate update packet.
+    /// </summary>
+    public GameMode GameMode => GameModeHolder.Value;
+
+    /// <summary>
+    /// The holder backing <see cref="GameMode"/>.
+    /// </summary>
+    public Holder<GameMode> GameModeHolder { get; set; } = new(new GameMode());
 
     public EntityPlayer(IWorldContext world) : base(world)
     {
@@ -61,8 +73,9 @@ public abstract class EntityPlayer : EntityLiving
         rotationOffset = 180.0F;
         fireImmunityTicks = 20;
         texture = "/mob/char.png";
-        GameMode = GameModes.DefaultGameMode;
     }
+
+    public override bool canBreatheUnderwater() => !GameMode.NeedsAir;
 
     protected void TickSleep()
     {
@@ -185,7 +198,7 @@ public abstract class EntityPlayer : EntityLiving
             heal(1);
         }
 
-        inventory.inventoryTick();
+        inventory.Tick();
     }
 
     protected void CollideWithPickupEntities()
@@ -311,7 +324,7 @@ public abstract class EntityPlayer : EntityLiving
             DropItem(new ItemStack(Item.Apple, 1), true);
         }
 
-        inventory.dropInventory();
+        inventory.DropInventory();
         if (adversary != null)
         {
             velocityX = (double)(-MathHelper.Cos((attackedAtYaw + yaw) * (float)System.Math.PI / 180.0F) * 0.1F);
@@ -343,7 +356,7 @@ public abstract class EntityPlayer : EntityLiving
     {
         if (GameMode.CanDrop)
         {
-            DropItem(inventory.removeStack(inventory.selectedSlot, 1), false);
+            DropItem(inventory.RemoveStack(inventory.SelectedSlot, 1), false);
         }
     }
 
@@ -395,7 +408,7 @@ public abstract class EntityPlayer : EntityLiving
 
     public float getBlockBreakingSpeed(Block block)
     {
-        float var2 = inventory.getStrVsBlock(block);
+        float var2 = inventory.GetStrVsBlock(block);
         if (isInFluid(Material.Water))
         {
             var2 /= 5.0F;
@@ -411,14 +424,14 @@ public abstract class EntityPlayer : EntityLiving
 
     public bool canHarvest(Block block)
     {
-        return inventory.canHarvestBlock(block);
+        return inventory.CanHarvestBlock(block);
     }
 
     public override void readNbt(NBTTagCompound nbt)
     {
         base.readNbt(nbt);
         NBTTagList var2 = nbt.GetTagList("Inventory");
-        inventory.readFromNBT(var2);
+        inventory.ReadFromNBT(var2);
         dimensionId = nbt.GetInteger("Dimension");
         sleeping = nbt.GetBoolean("Sleeping");
         sleepTimer = nbt.GetShort("SleepTimer");
@@ -437,7 +450,7 @@ public abstract class EntityPlayer : EntityLiving
     public override void writeNbt(NBTTagCompound nbt)
     {
         base.writeNbt(nbt);
-        nbt.SetTag("Inventory", inventory.writeToNBT(new NBTTagList()));
+        nbt.SetTag("Inventory", inventory.WriteToNBT(new NBTTagList()));
         nbt.SetInteger("Dimension", dimensionId);
         nbt.SetBoolean("Sleeping", sleeping);
         nbt.SetShort("SleepTimer", (short)sleepTimer);
@@ -471,7 +484,7 @@ public abstract class EntityPlayer : EntityLiving
         standingEyeHeight = 1.62F;
     }
 
-    public override bool damage(Entity damageSource, int amount)
+    public override bool damage(Entity? damageSource, int amount)
     {
         if (!GameMode.CanReceiveDamage) return false;
 
@@ -555,9 +568,9 @@ public abstract class EntityPlayer : EntityLiving
 
     protected override void applyDamage(int amount)
     {
-        int var2 = 25 - inventory.getTotalArmorValue();
+        int var2 = 25 - inventory.GetTotalArmorValue();
         int var3 = amount * var2 + damageSpill;
-        inventory.damageArmor(amount);
+        inventory.DamageArmor(amount);
         amount = var3 / 25;
         damageSpill = var3 % 25;
         base.applyDamage(amount);
@@ -584,9 +597,9 @@ public abstract class EntityPlayer : EntityLiving
             if (itemStackInHand != null && entity is EntityLiving living)
             {
                 itemStackInHand.useOnEntity(living, this);
-                if (itemStackInHand.count <= 0)
+                if (itemStackInHand.Count <= 0)
                 {
-                    itemStackInHand.onRemoved(this);
+                    ItemStack.onRemoved(this);
                     clearStackInHand();
                 }
             }
@@ -595,12 +608,12 @@ public abstract class EntityPlayer : EntityLiving
 
     public ItemStack getHand()
     {
-        return inventory.getSelectedItem();
+        return inventory.GetItemInHand();
     }
 
     public void clearStackInHand()
     {
-        inventory.setStack(inventory.selectedSlot, (ItemStack)null);
+        inventory.SetStack(inventory.SelectedSlot, (ItemStack)null);
     }
 
     public override double getStandingEyeHeight()
@@ -617,7 +630,7 @@ public abstract class EntityPlayer : EntityLiving
     public void attack(Entity target)
     {
         if (!GameMode.CanInflictDamage) return;
-        int var2 = inventory.getDamageVsEntity(target);
+        int var2 = inventory.GetDamageVsEntity(target);
         if (var2 > 0)
         {
             if (velocityY < 0.0D)
@@ -632,9 +645,9 @@ public abstract class EntityPlayer : EntityLiving
                 if (itemStackInHand != null)
                 {
                     itemStackInHand.postHit(living, this);
-                    if (itemStackInHand.count <= 0)
+                    if (itemStackInHand.Count <= 0)
                     {
-                        itemStackInHand.onRemoved(this);
+                        ItemStack.onRemoved(this);
                         clearStackInHand();
                     }
                 }
@@ -1017,7 +1030,7 @@ public abstract class EntityPlayer : EntityLiving
     public override int getItemStackTextureId(ItemStack stack)
     {
         int var2 = base.getItemStackTextureId(stack);
-        if (stack.itemId == Item.FishingRod.id && fishHook != null)
+        if (stack.ItemId == Item.FishingRod.id && fishHook != null)
         {
             var2 = stack.getTextureId() + 16;
         }
@@ -1032,4 +1045,9 @@ public abstract class EntityPlayer : EntityLiving
             inTeleportationState = true;
         }
     }
+
+    public virtual void sendChatMessage(string message) { }
+
+    protected internal const float AirFlySpeedMult = 5f;
+    protected override float AirSpeed() => GameMode.DisallowFlying ? 0.02f : AirFlySpeedMult * 0.02f;
 }

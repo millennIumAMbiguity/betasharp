@@ -21,8 +21,8 @@ public class ItemEntitySpawnS2CPacket() : Packet(PacketId.ItemEntitySpawnS2C)
     {
         var p = Get<ItemEntitySpawnS2CPacket>(PacketId.ItemEntitySpawnS2C);
         p.id = item.id;
-        p.itemRawId = item.stack.itemId;
-        p.itemCount = item.stack.count;
+        p.itemRawId = item.stack.ItemId;
+        p.itemCount = item.stack.Count;
         p.itemDamage = item.stack.getDamage();
         p.x = MathHelper.Floor(item.x * 32.0D);
         p.y = MathHelper.Floor(item.y * 32.0D);
@@ -33,7 +33,7 @@ public class ItemEntitySpawnS2CPacket() : Packet(PacketId.ItemEntitySpawnS2C)
         return p;
     }
 
-    public override void Read(NetworkStream stream)
+    public override void Read(Stream stream)
     {
         id = stream.ReadInt();
         itemRawId = stream.ReadShort();
@@ -47,7 +47,7 @@ public class ItemEntitySpawnS2CPacket() : Packet(PacketId.ItemEntitySpawnS2C)
         velocityZ = (sbyte)stream.ReadByte();
     }
 
-    public override void Write(NetworkStream stream)
+    public override void Write(Stream stream)
     {
         stream.WriteInt(id);
         stream.WriteShort((short)itemRawId);

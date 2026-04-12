@@ -6,7 +6,7 @@ namespace BetaSharp.Entities;
 public class EntityCow : EntityAnimal
 {
     public override EntityType Type => EntityRegistry.Cow;
-    
+
     public EntityCow(IWorldContext world) : base(world)
     {
         this.texture = "/mob/cow.png";
@@ -40,10 +40,10 @@ public class EntityCow : EntityAnimal
 
     public override bool interact(EntityPlayer player)
     {
-        ItemStack heldBucket = player.inventory.getSelectedItem();
-        if (heldBucket != null && heldBucket.itemId == Item.Bucket.id)
+        ItemStack heldBucket = player.inventory.GetItemInHand();
+        if (heldBucket != null && heldBucket.ItemId == Item.Bucket.id)
         {
-            player.inventory.setStack(player.inventory.selectedSlot, new ItemStack(Item.MilkBucket));
+            player.inventory.SetStack(player.inventory.SelectedSlot, new ItemStack(Item.MilkBucket));
             return true;
         }
         else

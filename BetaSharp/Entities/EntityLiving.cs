@@ -358,16 +358,16 @@ public abstract class EntityLiving : Entity
         if (health > 0)
         {
             health += amount;
-            if (health > 20)
+            if (health > maxHealth)
             {
-                health = 20;
+                health = maxHealth;
             }
 
             hearts = maxHealth / 2;
         }
     }
 
-    public override bool damage(Entity entity, int amount)
+    public override bool damage(Entity? entity, int amount)
     {
         if (world.IsRemote)
         {
@@ -546,12 +546,14 @@ public abstract class EntityLiving : Entity
             int var3 = world.Reader.GetBlockId(MathHelper.Floor(x), MathHelper.Floor(y - (double)0.2F - (double)standingEyeHeight), MathHelper.Floor(z));
             if (var3 > 0)
             {
-                BlockSoundGroup soundGroup = Block.Blocks[var3].soundGroup;
+                BlockSoundGroup soundGroup = Block.Blocks[var3].SoundGroup;
                 world.Broadcaster.PlaySoundAtEntity(this, soundGroup.StepSound, soundGroup.Volume * 0.5F, soundGroup.Pitch * (12.0F / 16.0F));
             }
         }
 
     }
+
+    protected virtual float AirSpeed() => 0.02f;
 
     public virtual void travel(float strafe, float forward)
     {
@@ -593,12 +595,12 @@ public abstract class EntityLiving : Entity
                 int groundBlockId = world.Reader.GetBlockId(MathHelper.Floor(x), MathHelper.Floor(boundingBox.MinY) - 1, MathHelper.Floor(z));
                 if (groundBlockId > 0)
                 {
-                    friction = Block.Blocks[groundBlockId].slipperiness * 0.91F;
+                    friction = Block.Blocks[groundBlockId].Slipperiness * 0.91F;
                 }
             }
 
             float movementFactor = 0.16277136F / (friction * friction * friction);
-            moveNonSolid(strafe, forward, onGround ? 0.1F * movementFactor : 0.02F);
+            moveNonSolid(strafe, forward, onGround ? 0.1F * movementFactor : AirSpeed());
             friction = 0.91F;
             if (onGround)
             {
@@ -606,7 +608,7 @@ public abstract class EntityLiving : Entity
                 int groundBlockId = world.Reader.GetBlockId(MathHelper.Floor(x), MathHelper.Floor(boundingBox.MinY) - 1, MathHelper.Floor(z));
                 if (groundBlockId > 0)
                 {
-                    friction = Block.Blocks[groundBlockId].slipperiness * 0.91F;
+                    friction = Block.Blocks[groundBlockId].Slipperiness * 0.91F;
                 }
             }
 
@@ -960,7 +962,7 @@ public abstract class EntityLiving : Entity
         return lookTarget;
     }
 
-    private float updateRotation(float var1, float var2, float var3)
+    private static float updateRotation(float var1, float var2, float var3)
     {
         float var4;
         for (var4 = var2 - var1; var4 < -180.0F; var4 += 360.0F)
@@ -985,7 +987,7 @@ public abstract class EntityLiving : Entity
         return var1 + var4;
     }
 
-    public void onEntityDeath()
+    public static void onEntityDeath()
     {
     }
 
@@ -1010,7 +1012,12 @@ public abstract class EntityLiving : Entity
         return lastSwingAnimationProgress + var2 * partialTick;
     }
 
-    public Vec3D getPosition(float partialTick)
+    public Vec3D GetPosition()
+    {
+        return new Vec3D(x, y, z);
+    }
+
+    public Vec3D GetPosition(float partialTick)
     {
         if (partialTick == 1.0F)
         {
@@ -1058,7 +1065,7 @@ public abstract class EntityLiving : Entity
 
     public HitResult rayTrace(double range, float partialTick)
     {
-        Vec3D startPos = getPosition(partialTick);
+        Vec3D startPos = GetPosition(partialTick);
         Vec3D lookDir = getLook(partialTick);
         Vec3D endPos = startPos + range * lookDir;
         return world.Reader.Raycast(startPos, endPos);

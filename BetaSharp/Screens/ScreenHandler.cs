@@ -103,22 +103,22 @@ public abstract class ScreenHandler
             InventoryPlayer playerInventory = player.inventory;
             if (index == -999)
             {
-                if (playerInventory.getCursorStack() is not null && index == -999)
+                if (playerInventory.GetCursorStack() is not null && index == -999)
                 {
                     if (button == 0)
                     {
-                        if (player.DropItem(playerInventory.getCursorStack()))
+                        if (player.DropItem(playerInventory.GetCursorStack()))
                         {
-                            playerInventory.setItemStack(null);
+                            playerInventory.SetCursorStack(null);
                         }
                     }
 
                     if (button == 1 && player.GameMode.CanDrop)
                     {
-                        player.DropItem(playerInventory.getCursorStack().split(1));
-                        if (playerInventory.getCursorStack().count == 0)
+                        player.DropItem(playerInventory.GetCursorStack().Split(1));
+                        if (playerInventory.GetCursorStack().Count == 0)
                         {
-                            playerInventory.setItemStack(null);
+                            playerInventory.SetCursorStack(null);
                         }
                     }
                 }
@@ -131,12 +131,12 @@ public abstract class ScreenHandler
                     ItemStack? itemStack = quickMove(index);
                     if (itemStack is not null)
                     {
-                        int itemStackSize = itemStack.count;
+                        int itemStackSize = itemStack.Count;
                         returnStack = itemStack.copy();
                         Slot slot = Slots[index];
                         if (slot is not null && slot.getStack() is not null)
                         {
-                            slotItemStackSize = slot.getStack().count;
+                            slotItemStackSize = slot.getStack().Count;
                             if (slotItemStackSize < itemStackSize)
                             {
                                 onSlotClick(index, button, shift, player);
@@ -151,7 +151,7 @@ public abstract class ScreenHandler
                     {
                         slot.markDirty();
                         ItemStack slotStack = slot.getStack();
-                        ItemStack cursorStack = playerInventory.getCursorStack();
+                        ItemStack cursorStack = playerInventory.GetCursorStack();
                         if (slotStack is not null)
                         {
                             returnStack = slotStack.copy();
@@ -161,76 +161,76 @@ public abstract class ScreenHandler
                         {
                             if (cursorStack is not null && slot.canInsert(cursorStack))
                             {
-                                slotItemStackSize = button == 0 ? cursorStack.count : 1;
+                                slotItemStackSize = button == 0 ? cursorStack.Count : 1;
                                 if (slotItemStackSize > slot.getMaxItemCount())
                                 {
                                     slotItemStackSize = slot.getMaxItemCount();
                                 }
 
-                                slot.setStack(cursorStack.split(slotItemStackSize));
-                                if (cursorStack.count == 0)
+                                slot.setStack(cursorStack.Split(slotItemStackSize));
+                                if (cursorStack.Count == 0)
                                 {
-                                    playerInventory.setItemStack(null);
+                                    playerInventory.SetCursorStack(null);
                                 }
                             }
                         }
                         else if (cursorStack is null)
                         {
-                            slotItemStackSize = button == 0 ? slotStack.count : (slotStack.count + 1) / 2;
+                            slotItemStackSize = button == 0 ? slotStack.Count : (slotStack.Count + 1) / 2;
                             ItemStack takenStack = slot.takeStack(slotItemStackSize);
-                            playerInventory.setItemStack(takenStack);
-                            if (slotStack.count == 0)
+                            playerInventory.SetCursorStack(takenStack);
+                            if (slotStack.Count == 0)
                             {
                                 slot.setStack(null);
                             }
 
-                            slot.onTakeItem(playerInventory.getCursorStack());
+                            slot.onTakeItem(playerInventory.GetCursorStack());
                         }
                         else if (slot.canInsert(cursorStack))
                         {
-                            if (slotStack.itemId != cursorStack.itemId || slotStack.getHasSubtypes() && slotStack.getDamage() != cursorStack.getDamage())
+                            if (slotStack.ItemId != cursorStack.ItemId || slotStack.getHasSubtypes() && slotStack.getDamage() != cursorStack.getDamage())
                             {
-                                if (cursorStack.count <= slot.getMaxItemCount())
+                                if (cursorStack.Count <= slot.getMaxItemCount())
                                 {
                                     slot.setStack(cursorStack);
-                                    playerInventory.setItemStack(slotStack);
+                                    playerInventory.SetCursorStack(slotStack);
                                 }
                             }
                             else
                             {
-                                slotItemStackSize = button == 0 ? cursorStack.count : 1;
-                                if (slotItemStackSize > slot.getMaxItemCount() - slotStack.count)
+                                slotItemStackSize = button == 0 ? cursorStack.Count : 1;
+                                if (slotItemStackSize > slot.getMaxItemCount() - slotStack.Count)
                                 {
-                                    slotItemStackSize = slot.getMaxItemCount() - slotStack.count;
+                                    slotItemStackSize = slot.getMaxItemCount() - slotStack.Count;
                                 }
 
-                                if (slotItemStackSize > cursorStack.getMaxCount() - slotStack.count)
+                                if (slotItemStackSize > cursorStack.getMaxCount() - slotStack.Count)
                                 {
-                                    slotItemStackSize = cursorStack.getMaxCount() - slotStack.count;
+                                    slotItemStackSize = cursorStack.getMaxCount() - slotStack.Count;
                                 }
 
-                                cursorStack.split(slotItemStackSize);
-                                if (cursorStack.count == 0)
+                                cursorStack.Split(slotItemStackSize);
+                                if (cursorStack.Count == 0)
                                 {
-                                    playerInventory.setItemStack(null);
+                                    playerInventory.SetCursorStack(null);
                                 }
 
-                                slotStack.count += slotItemStackSize;
+                                slotStack.Count += slotItemStackSize;
                             }
                         }
-                        else if (slotStack.itemId == cursorStack.itemId && cursorStack.getMaxCount() > 1 && (!slotStack.getHasSubtypes() || slotStack.getDamage() == cursorStack.getDamage()))
+                        else if (slotStack.ItemId == cursorStack.ItemId && cursorStack.getMaxCount() > 1 && (!slotStack.getHasSubtypes() || slotStack.getDamage() == cursorStack.getDamage()))
                         {
-                            slotItemStackSize = slotStack.count;
-                            if (slotItemStackSize > 0 && slotItemStackSize + cursorStack.count <= cursorStack.getMaxCount())
+                            slotItemStackSize = slotStack.Count;
+                            if (slotItemStackSize > 0 && slotItemStackSize + cursorStack.Count <= cursorStack.getMaxCount())
                             {
-                                cursorStack.count += slotItemStackSize;
-                                slotStack.split(slotItemStackSize);
-                                if (slotStack.count == 0)
+                                cursorStack.Count += slotItemStackSize;
+                                slotStack.Split(slotItemStackSize);
+                                if (slotStack.Count == 0)
                                 {
                                     slot.setStack(null);
                                 }
 
-                                slot.onTakeItem(playerInventory.getCursorStack());
+                                slot.onTakeItem(playerInventory.GetCursorStack());
                             }
                         }
                     }
@@ -243,18 +243,18 @@ public abstract class ScreenHandler
     public virtual void onClosed(EntityPlayer player)
     {
         InventoryPlayer playerInventory = player.inventory;
-        if (playerInventory.getCursorStack() is not null)
+        if (playerInventory.GetCursorStack() is not null)
         {
             if (player.GameMode.CanDrop)
             {
-                if (player.DropItem(playerInventory.getCursorStack()))
+                if (player.DropItem(playerInventory.GetCursorStack()))
                 {
-                    playerInventory.setItemStack(null);
+                    playerInventory.SetCursorStack(null);
                 }
             }
             else
             {
-                player.inventory.AddItemStackToInventoryOrDrop(playerInventory.getCursorStack());
+                player.inventory.AddItemStackToInventoryOrDrop(playerInventory.GetCursorStack());
             }
         }
 
@@ -289,11 +289,11 @@ public abstract class ScreenHandler
         return _revision;
     }
 
-    public void onAcknowledgementAccepted(short actionType)
+    public static void onAcknowledgementAccepted(short actionType)
     {
     }
 
-    public void onAcknowledgementDenied(short actionType)
+    public static void onAcknowledgementDenied(short actionType)
     {
     }
 
@@ -328,23 +328,23 @@ public abstract class ScreenHandler
         ItemStack itemStackToInsert;
         if (stack.isStackable())
         {
-            while (stack.count > 0 && (!fromLast && slotIndex < end || fromLast && slotIndex >= start))
+            while (stack.Count > 0 && (!fromLast && slotIndex < end || fromLast && slotIndex >= start))
             {
                 slotToInsertStack = Slots[slotIndex];
                 itemStackToInsert = slotToInsertStack.getStack();
-                if (itemStackToInsert is not null && itemStackToInsert.itemId == stack.itemId && (!stack.getHasSubtypes() || stack.getDamage() == itemStackToInsert.getDamage()))
+                if (itemStackToInsert is not null && itemStackToInsert.ItemId == stack.ItemId && (!stack.getHasSubtypes() || stack.getDamage() == itemStackToInsert.getDamage()))
                 {
-                    int newitemStackSize = itemStackToInsert.count + stack.count;
+                    int newitemStackSize = itemStackToInsert.Count + stack.Count;
                     if (newitemStackSize <= stack.getMaxCount())
                     {
-                        stack.count = 0;
-                        itemStackToInsert.count = newitemStackSize;
+                        stack.Count = 0;
+                        itemStackToInsert.Count = newitemStackSize;
                         slotToInsertStack.markDirty();
                     }
-                    else if (itemStackToInsert.count < stack.getMaxCount())
+                    else if (itemStackToInsert.Count < stack.getMaxCount())
                     {
-                        stack.count -= stack.getMaxCount() - itemStackToInsert.count;
-                        itemStackToInsert.count = stack.getMaxCount();
+                        stack.Count -= stack.getMaxCount() - itemStackToInsert.Count;
+                        itemStackToInsert.Count = stack.getMaxCount();
                         slotToInsertStack.markDirty();
                     }
                 }
@@ -360,7 +360,7 @@ public abstract class ScreenHandler
             }
         }
 
-        if (stack.count > 0)
+        if (stack.Count > 0)
         {
             if (fromLast)
             {
@@ -379,7 +379,7 @@ public abstract class ScreenHandler
                 {
                     slotToInsertStack.setStack(stack.copy());
                     slotToInsertStack.markDirty();
-                    stack.count = 0;
+                    stack.Count = 0;
                     break;
                 }
 

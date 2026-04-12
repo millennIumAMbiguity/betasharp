@@ -78,7 +78,7 @@ public class GameRenderer
 
         double reachDistance = (double)_client.PlayerController.getBlockReachDistance();
         _client.ObjectMouseOver = _client.Camera.rayTrace(reachDistance, tickDelta);
-        Vec3D cameraPosition = _client.Camera.getPosition(tickDelta);
+        Vec3D cameraPosition = _client.Camera.GetPosition(tickDelta);
 
         if (_client.ObjectMouseOver.Type != HitResultType.MISS)
         {
@@ -421,7 +421,7 @@ public class GameRenderer
 
         using (Profiler.Begin("RenderEntities"))
         {
-            worldRenderer.RenderEntities(entity.getPosition(tickDelta), frustrumCuller, tickDelta);
+            worldRenderer.RenderEntities(entity.GetPosition(tickDelta), frustrumCuller, tickDelta);
         }
 
         particleManager.renderSpecialParticles(entity, tickDelta);
@@ -439,8 +439,8 @@ public class GameRenderer
         {
             entityPlayer = (EntityPlayer)entity;
             GLManager.GL.Disable(GLEnum.AlphaTest);
-            worldRenderer.DrawBlockBreaking(entityPlayer, _client.ObjectMouseOver, entityPlayer.inventory.getSelectedItem(), tickDelta);
-            worldRenderer.DrawSelectionBox(entityPlayer, _client.ObjectMouseOver, 0, entityPlayer.inventory.getSelectedItem(), tickDelta);
+            worldRenderer.DrawBlockBreaking(entityPlayer, _client.ObjectMouseOver, entityPlayer.inventory.GetItemInHand(), tickDelta);
+            worldRenderer.DrawSelectionBox(entityPlayer, _client.ObjectMouseOver, 0, entityPlayer.inventory.GetItemInHand(), tickDelta);
             GLManager.GL.Enable(GLEnum.AlphaTest);
         }
 
@@ -466,8 +466,8 @@ public class GameRenderer
         {
             entityPlayer = (EntityPlayer)entity;
             GLManager.GL.Disable(GLEnum.AlphaTest);
-            worldRenderer.DrawBlockBreaking(entityPlayer, _client.ObjectMouseOver, entityPlayer.inventory.getSelectedItem(), tickDelta);
-            worldRenderer.DrawSelectionBox(entityPlayer, _client.ObjectMouseOver, 0, entityPlayer.inventory.getSelectedItem(), tickDelta);
+            worldRenderer.DrawBlockBreaking(entityPlayer, _client.ObjectMouseOver, entityPlayer.inventory.GetItemInHand(), tickDelta);
+            worldRenderer.DrawSelectionBox(entityPlayer, _client.ObjectMouseOver, 0, entityPlayer.inventory.GetItemInHand(), tickDelta);
             GLManager.GL.Enable(GLEnum.AlphaTest);
         }
 
